@@ -1,6 +1,10 @@
 using System.Globalization;
+using ChessWebApp.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace ChessWebApp
 {
@@ -10,7 +14,7 @@ namespace ChessWebApp
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            var connectionString = builder.Configuration.GetConnectionString("ChessIdentity") ?? throw new InvalidOperationException("Connection string 'ChessIdentity' not found.");
             builder.Services.AddControllersWithViews()
                 .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix);
             builder.Services.AddLocalization(options => options.ResourcesPath = "Data/Resources");
@@ -24,6 +28,19 @@ namespace ChessWebApp
                 options.DefaultRequestCulture = new RequestCulture("en-US");
                 options.SupportedCultures = supportedCultures;
             });
+            builder.Services.AddHttpContextAccessor();
+            builder.Services.AddDbContext<ChessIdentityDbContext>(options =>
+            {
+                options.UseSqlServer(connectionString);
+            });
+            builder.Services
+                .AddIdentity<ChessUser, ChessRole>()
+                .AddUserManager<UserManager<ChessUser>>()
+                .AddEntityFrameworkStores<ChessIdentityDbContext>()
+                .AddUserStore<UserStore<ChessUser, ChessRole, ChessIdentityDbContext>>()
+                .AddUserStore<UserStore<ChessUser, ChessRole, ChessIdentityDbContext>>()
+                .AddRoleStore<RoleStore<ChessRole, ChessIdentityDbContext>>();
+
             var app = builder.Build();
             app.UseRequestLocalization();
             // Configure the HTTP request pipeline.
@@ -39,6 +56,7 @@ namespace ChessWebApp
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(
