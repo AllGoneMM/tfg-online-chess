@@ -1,0 +1,40 @@
+﻿@inject IViewLocalizer Localizer
+
+<nav class="navbar navbar-expand-sm border border-1 p-0">
+    <div class="container-fluid pe-1">
+        <div class="d-flex align-items-center gap-2">
+            <a class="d-sm-none text-dark" data-bs-toggle="offcanvas" href="#navbarOffcanvas">
+                <i class="fa-solid fa-bars"></i>
+            </a>
+            <a asp-action="Index" asp-controller="Home" class="navbar-brand p-0">
+                <div class="d-flex align-items-center gap-2 border border-1">
+                    <img src="~/assets/img/template.webp" alt="Logo" width="30" height="24"/>
+                    <span class="d-none d-sm-block">BRAND</span>
+                </div>
+            </a>
+        </div>
+
+        <div class="offcanvas offcanvas-start w-75" id="navbarOffcanvas">
+            <div class="offcanvas-header pt-1 pb-1 border border-1">
+                <div class="d-flex align-items-center gap-2 border border-1">
+                    <img src="~/assets/img/template.webp" alt="Logo" width="30" height="24"/>
+                    <span>BRAND</span>
+                </div>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button></div>
+            <div class="offcanvas-body">
+                <ul class="navbar-nav border border-1">
+                    <li class="nav-item">
+                        <a asp-action="Index" asp-controller="Home" class="nav-link active ps-sm-2 pe-sm-2 pt-sm-0 pb-sm-0">@Localizer["Home"]</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link ps-sm-2 pe-sm-2 pt-sm-0 pb-sm-0">@Localizer["Link"] 2</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link ps-sm-2 pe-sm-2 pt-sm-0 pb-sm-0">@Localizer["Link"] 3</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <partial name="Navbar/_NavbarLogin" />
+    </div>
+</nav>
