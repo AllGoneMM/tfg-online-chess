@@ -9,6 +9,6 @@ window.onresize = function () {
 function adjustContentHeight() {
     var navbarHeight = document.getElementById('navbar').offsetHeight;
     let rowContent = document.getElementById('rowContent');
-    rowContent.style.cssText = "min-height: calc(100vh - " + navbarHeight + "px) !important;";
+    rowContent.style.cssText = "min-height: calc(100dvh - " + navbarHeight + "px) !important;";
 }
 
