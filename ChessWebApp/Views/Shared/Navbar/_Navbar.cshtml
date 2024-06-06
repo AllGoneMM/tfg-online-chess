@@ -15,7 +15,7 @@
         </div>
 
         <div class="offcanvas offcanvas-start w-75" id="navbarOffcanvas">
-            <div class="offcanvas-header pt-1 pb-1 border border-1">
+            <div class="offcanvas-header border border-1">
                 <div class="d-flex align-items-center gap-2 border border-1">
                     <img src="~/assets/img/template.webp" alt="Logo" width="30" height="24" />
                     <span>BRAND</span>
@@ -25,13 +25,13 @@
             <div class="offcanvas-body">
                 <ul class="navbar-nav border border-1">
                     <li class="nav-item">
-                        <a asp-action="Index" asp-controller="Home" class="nav-link active ps-sm-2 pe-sm-2 pt-sm-0 pb-sm-0">@Localizer["Home"]</a>
+                        <a asp-action="Index" asp-controller="Home" class="nav-link active">@Localizer["Home"]</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link ps-sm-2 pe-sm-2 pt-sm-0 pb-sm-0">@Localizer["Link"] 2</a>
+                        <a asp-active-controller-action="Home:Index" asp-active-class-add="active" class="nav-link">@Localizer["Link"] 2</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link ps-sm-2 pe-sm-2 pt-sm-0 pb-sm-0">@Localizer["Link"] 3</a>
+                        <a class="nav-link">@Localizer["Link"] 3</a>
                     </li>
                 </ul>
             </div>
