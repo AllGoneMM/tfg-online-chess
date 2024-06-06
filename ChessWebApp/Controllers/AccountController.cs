@@ -4,10 +4,12 @@ namespace ChessWebApp.Controllers
 {
     public class AccountController : Controller
     {
-        public IActionResult Login()
+        [HttpGet]
+        public IActionResult LogIn()
         {
             return View();
         }
+        [HttpGet]
         public IActionResult SignUp()
         {
             return View();
