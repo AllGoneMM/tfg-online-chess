@@ -1,4 +1,5 @@
 ﻿@inject IViewLocalizer Localizer
+@model ChessWebApp.Models.ViewModels.LogInVM
 @{
     ViewData["Title"] = Localizer["Sign Up"];
 }
@@ -6,3 +7,50 @@
 {
     <link rel="stylesheet" href="~/css/login-signup.css" />
 }
+<div class="row p-4 min-vh-100 d-flex flex-column justify-content-center align-items-center">
+
+
+    <div class="col-10 col-md-8 col-lg-6 col-xl-5 d-flex flex-column text-white bg-black p-4 rounded">
+        <div class="d-flex justify-content-center mb-4 mt-2">
+            <a asp-action="Index" asp-controller="Home"> <img src="~/assets/img/template.webp" height="80px" width="80px" /></a>
+        </div>
+        <form asp-action="LogIn" asp-controller="Account">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="input-group mb-3">
+                <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+                <input id="email" name="email" type="text" class="form-control" placeholder="Email">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                <input id="username" name="username" type="text" class="form-control" placeholder="Username">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                <input id="password" name="password" type="password" class="form-control" placeholder="Password">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                <input id="repeatPassword" name="repeatPassword" type="password" class="form-control" placeholder="Repeat password">
+            </div>
+            <button class="btn btn-lg btn-outline-success w-100 mt-4" type="submit">Sign Up</button>
+            <div class="d-flex justify-content-center align-items-center gap-2 mt-4 mb-4">
+                <span class="border border-1 border-white flex-grow-1"></span>
+                <span>@Localizer["OR"]</span>
+                <span class="border border-1 border-white flex-grow-1"></span>
+            </div>
+        </form>
+        <div class="d-flex gap-2 flex-column">
+            <button class="btn btn-outline-info">OAuth</button>
+            <button class="btn btn-outline-info">OAuth</button>
+            <button class="btn btn-outline-info">OAuth</button>
+        </div>
+        <div class="d-flex justify-content-center mt-4">
+            <span class="me-2">@Localizer["Already have an account?"]</span>
+            <a asp-action="LogIn" asp-controller="Account" class="text-success ms-1">@Localizer["Log In"]</a>
+        </div>
+    </div>
+</div>
+
+
+
+
