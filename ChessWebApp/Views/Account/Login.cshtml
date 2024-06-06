@@ -1,2 +1,18 @@
-﻿@section Stylesheets
-{<link rel="stylesheet" href="~/assets/img/template.webp"/>}
+﻿@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer["Log In"];
+}
+@section Stylesheets
+{
+    <link rel="stylesheet" href="~/css/login-signup.css"/>
+}
+<div class="row p-4">
+    <div class="col-12 d-flex justify-content-center">
+        <img src="~/assets/img/template.webp" height="80px" width="80px" class="img-fluid"/>
+    </div>
+    <div class="col-12">
+        <form>
+
+        </form>
+    </div>
+</div>

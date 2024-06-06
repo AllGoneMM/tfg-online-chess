@@ -1,6 +1,6 @@
 ﻿@inject IViewLocalizer Localizer
 
-<nav class="navbar navbar-expand-sm border border-1">
+<nav asp-active-controller-action="Account:LogIn SignUp" asp-active-add="false" id="navbar" class="navbar navbar-expand-sm border border-1">
     <div class="container-fluid">
         <div class="d-flex align-items-center gap-2">
             <a class="d-sm-none text-dark" data-bs-toggle="offcanvas" href="#navbarOffcanvas">
@@ -8,7 +8,7 @@
             </a>
             <a asp-action="Index" asp-controller="Home" class="navbar-brand p-0">
                 <div class="d-flex align-items-center gap-2 border border-1">
-                    <img src="~/assets/img/template.webp" alt="Logo" width="30" height="24"/>
+                    <img src="~/assets/img/template.webp" alt="Logo" width="30" height="24" />
                     <span class="d-none d-sm-block">BRAND</span>
                 </div>
             </a>
@@ -17,10 +17,11 @@
         <div class="offcanvas offcanvas-start w-75" id="navbarOffcanvas">
             <div class="offcanvas-header pt-1 pb-1 border border-1">
                 <div class="d-flex align-items-center gap-2 border border-1">
-                    <img src="~/assets/img/template.webp" alt="Logo" width="30" height="24"/>
+                    <img src="~/assets/img/template.webp" alt="Logo" width="30" height="24" />
                     <span>BRAND</span>
                 </div>
-                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button></div>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+            </div>
             <div class="offcanvas-body">
                 <ul class="navbar-nav border border-1">
                     <li class="nav-item">

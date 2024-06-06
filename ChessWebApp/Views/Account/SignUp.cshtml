@@ -1,2 +1,8 @@
-﻿@section Stylesheets
-{<link rel="stylesheet" href="~/assets/img/template.webp"/>}
+﻿@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer["Sign Up"];
+}
+@section Stylesheets
+{
+    <link rel="stylesheet" href="~/css/login-signup.css" />
+}

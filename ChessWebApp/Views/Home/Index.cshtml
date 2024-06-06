@@ -2,23 +2,24 @@
 @{
     ViewData["Title"] = Localizer["Home"];
 }
-    <div class="container">
-        <div class="row min-vh-100" >
-        <div class="col-12 position m-auto vh-100" style="top:0; bottom:0;right:0;left:0;">
-                <div class="d-flex flex-column gap-4">
-                    <h1 class="display-1 text-center">
-                        H1 Title
-                        <br/>
-                        <small class="text-muted">Subtitle</small>
-                    </h1>
-                    <div class="d-flex flex-column gap-2">
-                        <button class="btn btn-outline-info btn-lg flex-grow-1">Play online</button>
-                        <button class="btn btn-outline-info btn-lg">Play offline</button>
-                    </div>
-                </div>
+<div id="rowContent" class="row p-4">
+    <div class="col-6 d-none d-md-block bg-primary">
+    </div>
+    <div class="col-12 col-md-6">
+        <div class="d-flex flex-column h-100 w-100 justify-content-center gap-4">
+            <div class="text-center d-flex justify-content-center align-items-center flex-grow-1">
+                <h1 class="display-1" style="font-size: 6rem;">
+                    H1 Title
+                    <br>
+                    <small class="text-muted">Subtitle</small>
+                </h1>
             </div>
+            <a asp-action="Online" asp-controller="Play" class="btn btn-lg btn-outline-primary flex-grow-1"><span class="display-4">@Localizer["Play online"]</span></a>
+            <a asp-action="Offline" asp-controller="Play" class="btn btn-lg btn-outline-secondary flex-grow-1"><span class="display-4">@Localizer["Play offline"]</span></a>
         </div>
+    </div>
 </div>
 
-
-
+@section Scripts {
+    <script src="~/js/root.js"></script>
+}

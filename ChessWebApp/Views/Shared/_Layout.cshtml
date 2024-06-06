@@ -3,20 +3,18 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - ChessWebApp</title>
+    <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/global.css" />
     @await RenderSectionAsync("Stylesheets", required: false)
     <script src="https://kit.fontawesome.com/0f96db56df.js" crossorigin="anonymous"></script>
 </head>
-<body asp-active-class="login-background" asp-active-action-controller="Home,Index">
+<body asp-active-controller-action="Account:LogIn SignUp" asp-active-class-add="login-background">
     <header>
         <partial name="Navbar/_Navbar" />
     </header>
     <div class="container">
-        <main role="main">
             @RenderBody()
-        </main>
     </div>
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
