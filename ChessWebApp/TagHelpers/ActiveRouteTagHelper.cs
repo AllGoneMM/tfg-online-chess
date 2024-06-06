@@ -23,6 +23,9 @@ namespace ChessWebApp.TagHelpers
         [HtmlAttributeName("asp-active-class-remove")]
         public string RemoveClass { get; set; }
 
+        [HtmlAttributeName("asp-active-add")]
+        public string ActiveAdd { get; set; }
+
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             var routeData = _httpContextAccessor.HttpContext.GetRouteData();
@@ -32,6 +35,7 @@ namespace ChessWebApp.TagHelpers
             var controllerActionGroups = ParseControllerActionGroups(ControllerActionPairs);
             var addClasses = ParseClasses(AddClass);
             var removeClasses = ParseClasses(RemoveClass);
+            var activeAdds = ParseBooleans(ActiveAdd);
 
             for (int i = 0; i < controllerActionGroups.Count; i++)
             {
@@ -44,6 +48,13 @@ namespace ChessWebApp.TagHelpers
                 if (string.Equals(group.Controller, currentController, StringComparison.OrdinalIgnoreCase) &&
                     group.Actions.Contains(currentAction, StringComparer.OrdinalIgnoreCase))
                 {
+                    // Handle element visibility
+                    if (i < activeAdds.Count && !activeAdds[i])
+                    {
+                        output.SuppressOutput();
+                        return;
+                    }
+
                     // Remove specified classes
                     if (i < removeClasses.Count)
                     {
@@ -106,6 +117,11 @@ namespace ChessWebApp.TagHelpers
         private List<string> ParseClasses(string input)
         {
             return input?.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(c => c.Trim()).ToList() ?? new List<string>();
+        }
+
+        private List<bool> ParseBooleans(string input)
+        {
+            return input?.Split(';', StringSplitOptions.RemoveEmptyEntries).Select(b => bool.Parse(b.Trim())).ToList() ?? new List<bool>();
         }
 
         private class ControllerActionGroup
