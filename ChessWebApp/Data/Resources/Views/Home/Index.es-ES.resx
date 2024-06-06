@@ -120,4 +120,10 @@
   <data name="Home" xml:space="preserve">
     <value>Inicio</value>
   </data>
+  <data name="Play offline" xml:space="preserve">
+    <value>Jugar contra IA</value>
+  </data>
+  <data name="Play online" xml:space="preserve">
+    <value>Jugar en línea</value>
+  </data>
 </root>
