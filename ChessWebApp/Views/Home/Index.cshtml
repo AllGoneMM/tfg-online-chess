@@ -1,23 +1,24 @@
 ﻿@inject IViewLocalizer Localizer
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = Localizer["Home"];
 }
-@section Stylesheets
-{
-    <link rel="stylesheet" href="~/css/login.css"/>
-}
-<div class="row">
-    <div class="col">
-
-    </div>
-    <div class="col">
-        <div class="d-flex flex-column">
-            <div class="text-center">
-                <h1 class="display-2 mb-4">H1 Title</h1>
+    <div class="container">
+        <div class="row min-vh-100" >
+        <div class="col-12 position m-auto vh-100" style="top:0; bottom:0;right:0;left:0;">
+                <div class="d-flex flex-column gap-4">
+                    <h1 class="display-1 text-center">
+                        H1 Title
+                        <br/>
+                        <small class="text-muted">Subtitle</small>
+                    </h1>
+                    <div class="d-flex flex-column gap-2">
+                        <button class="btn btn-outline-info btn-lg flex-grow-1">Play online</button>
+                        <button class="btn btn-outline-info btn-lg">Play offline</button>
+                    </div>
+                </div>
             </div>
-            <button class="btn btn-primary mb-2">Play online</button>
-            <button class="btn btn-primary">Play offline</button>
         </div>
-    </div>
 </div>
+
+
 
