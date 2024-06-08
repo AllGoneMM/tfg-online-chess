@@ -1,5 +1,6 @@
 using System.Globalization;
 using ChessWebApp.Identity;
+using ChessWebApp.Models.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
@@ -16,7 +17,9 @@ namespace ChessWebApp
 
             var connectionString = builder.Configuration.GetConnectionString("ChessIdentity") ?? throw new InvalidOperationException("Connection string 'ChessIdentity' not found.");
             builder.Services.AddControllersWithViews()
-                .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix);
+                .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+                .AddDataAnnotationsLocalization();
+                
             builder.Services.AddLocalization(options => options.ResourcesPath = "Data/Resources");
             builder.Services.Configure<RequestLocalizationOptions>(options =>
             {
@@ -34,7 +37,19 @@ namespace ChessWebApp
                 options.UseSqlServer(connectionString);
             });
             builder.Services
-                .AddIdentity<ChessUser, ChessRole>()
+                .AddIdentity<ChessUser, ChessRole>(
+                    options =>
+                    {
+                        options.SignIn.RequireConfirmedEmail = false;
+                        options.SignIn.RequireConfirmedPhoneNumber = false;
+                        options.SignIn.RequireConfirmedAccount = false;
+                        options.Password.RequireNonAlphanumeric = false;
+                        options.Password.RequireLowercase = false;
+                        options.Password.RequireUppercase = false;
+                        options.Password.RequiredLength = 1;
+                        options.Password.RequireDigit = false;
+
+                    })
                 .AddUserManager<UserManager<ChessUser>>()
                 .AddEntityFrameworkStores<ChessIdentityDbContext>()
                 .AddUserStore<UserStore<ChessUser, ChessRole, ChessIdentityDbContext>>()
