@@ -5,6 +5,17 @@
     <a asp-action="SignUp" asp-controller="Account" class="btn btn-sm btn-outline-primary">@Localizer["Sign Up"]</a>
     <a asp-action="LogIn" asp-controller="Account" class="btn btn-sm btn-outline-secondary">@Localizer["Log In"]</a>
 </div>
-<div asp-authenticated="true" class="d-flex justify-content-end">
-    Signed in as <strong>@SignInManager.Context.User.Identity.Name</strong>
+<div asp-authenticated="true" class="dropdown">
+    <a class="btn btn-primary rounded-circle" role="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+        <i class="fa-solid fa-user"></i>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" style="z-index:20;">
+        <li>
+            <span class="dropdown-item-text fw-bold text-center w-100">@User.Identity.Name</span>
+        </li>
+        <li><hr class="dropdown-divider"></li>
+        <li class="dropdown-item ">
+            <form asp-action="LogOut" asp-controller="Account"><button type="submit" class="btn btn-sm btn-outline-danger w-100">@Localizer["Log Out"]</button></form>
+        </li>
+    </ul>
 </div>
