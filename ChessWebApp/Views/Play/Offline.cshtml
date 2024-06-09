@@ -2,27 +2,21 @@
 @{
     ViewData["Title"] = Localizer["Play offline"];
 }
-<div class="row pt-4 pb-4">
-    <div class="col-12 col-lg-6">
-        <div id="boardContent" class="d-flex flex-column gap-4">
-
-            <div id="opponentDiv" class="d-flex gap-2">
+<div class="row">
+    <div class="col-12 col-lg-6 d-flex align-items-center justify-content-center" id="boardContainer">
+        <div id="boardContent" class="d-flex flex-column">
+            <div id="opponentDiv" class="d-flex gap-2 pb-3 pt-4">
                 <div class="bg-primary rounded" style="width:30px;height:30px"></div>
-                <div>OPPONENT</div>
+                <div>USER</div>
             </div>
-
-
-            <div class="h-100" id="board2"></div>
-
-
-            <div id="userDiv" class="d-flex gap-2">
+            <div class="d-flex align-items-center justify-content-center" id="board2"></div>
+            <div id="userDiv" class="d-flex gap-2 pt-3 pb-4">
                 <div class="bg-primary rounded" style="width:30px;height:30px"></div>
                 <div>USER</div>
             </div>
         </div>
-
     </div>
-    <div class="col-12 col-md-6 ">
+    <div class="col-12 col-md-6">
         <button class="w-100 btn btn-primary mb-4" id="startBtn">START</button>
         <button class="w-100 btn btn-primary" id="clearBtn">CLEAR</button>
     </div>
