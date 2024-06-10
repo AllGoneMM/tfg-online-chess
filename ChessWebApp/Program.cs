@@ -3,6 +3,7 @@ using ChessLibrary;
 using ChessWebApp.Hubs;
 using ChessWebApp.Identity;
 using ChessWebApp.Models.ViewModels;
+using ChessWebApp.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
@@ -58,7 +59,7 @@ namespace ChessWebApp
                 .AddUserStore<UserStore<ChessUser, ChessRole, ChessIdentityDbContext>>()
                 .AddRoleStore<RoleStore<ChessRole, ChessIdentityDbContext>>();
             builder.Services.AddSignalR();
-            builder.Services.AddSingleton<ChessGame>();
+            builder.Services.AddSingleton<GameService>();
             var app = builder.Build();
             app.UseRequestLocalization();
             // Configure the HTTP request pipeline.
@@ -69,6 +70,7 @@ namespace ChessWebApp
                 app.UseHsts();
             }
             app.MapHub<OfflineGameHub>("/hubs/offlinegame");
+            app.MapHub<OnlineGameHub>("/hubs/onlinegame");
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

@@ -1,26 +1,64 @@
 ﻿using ChessLibrary;
 using ChessLibrary.Engine.Movement;
 using Microsoft.AspNetCore.SignalR;
+using Stockfish.NET;
+using System.Text.Json;
+using ChessWebApp.Services;
 
 namespace ChessWebApp.Hubs
 {
-    public class OfflineGameHub(ChessGame game) : Hub
+    public class OfflineGameHub : Hub
     {
+        private readonly GameService _gameService;
+
+        public OfflineGameHub(GameService gameService)
+        {
+            _gameService = gameService;
+        }
+
         public override Task OnConnectedAsync()
         {
-            game = new ChessGame();
+            _gameService.GetOrCreateGame(Context.ConnectionId);
             return base.OnConnectedAsync();
         }
-        public async Task<bool> IsLegalMove(string move)
+
+        public override Task OnDisconnectedAsync(Exception exception)
         {
-            // Aquí implementa la lógica para verificar si el movimiento es legal
-            // Supongamos que tienes una clase ChessGame con un método IsLegalMove
+            _gameService.RemoveGame(Context.ConnectionId);
+            return base.OnDisconnectedAsync(exception);
+        }
+
+        public async Task<string> StartGame()
+        {
+            _gameService.RemoveGame(Context.ConnectionId);
+            ChessGame game = _gameService.GetOrCreateGame(Context.ConnectionId);
+            return JsonSerializer.Serialize(new
+            {
+                Fen = game.ToString(),
+                State = game.State,
+                Promotion = game.Promotion
+            });
+        }
+        public async Task<string> ProcessMove(string move)
+        {
+            ChessGame game = _gameService.GetOrCreateGame(Context.ConnectionId);
+
             MoveResult result = game.Move(move);
             if (result.IsSuccessful())
             {
-                return true;
+                IStockfish stockfishAI1 = new Stockfish.NET.Stockfish(@"C:\Users\Mykyta\source\repos\tfg-chess\ChessLibrary.UITests\stockfish.exe");
+                stockfishAI1.SetFenPosition(game.ToString());
+                game.Move(stockfishAI1.GetBestMove());
             }
-            return false;
+
+            var gameJson = new
+            {
+                Fen = game.ToString(),
+                State = game.State,
+                Promotion = game.Promotion
+            };
+
+            return JsonSerializer.Serialize(gameJson);
         }
     }
 }
