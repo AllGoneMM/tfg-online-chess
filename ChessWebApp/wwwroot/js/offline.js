@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                     snapSpeed: 100,
                     position: 'start',
                     onDrop: onDrop,
+                    onSnapEnd: onSnapEnd,
                     onDragStart: onDragStart
                 });
             })
@@ -33,20 +34,27 @@ document.addEventListener('DOMContentLoaded', async function () {
 });
 
 async function onDrop(source, target, piece, newPos, oldPos, orientation) {
+    removeGreySquares();
     let move = source + target;
-    await signalRConnection.invoke("ProcessMove", move)
+    return await signalRConnection.invoke("ProcessMove", move)
         .then((response) => {
-
+            response = JSON.parse(response);
+            if (!response.Success) {
+                return 'snapback';
+            }
+            chessGame = response.Fen;
         })
-        .catch(() => {
-            window.alert("Error al procesar el movimiento");
+        .catch((error) => {
+            console.error("Error processing move:", error);
             return 'snapback';
         });
-
 }
-//function onSnapEnd() {
-//    chessBoard.position(updatedBoar);
-//}
+function onSnapEnd() {
+    chessBoard.position(chessGame);
+}
+function removeGreySquares() {
+    $('#chessBoard .square-55d63').css('background', '')
+}
 
 async function onDragStart(source, piece, position, orientation) {
     await signalRConnection.invoke("GetLegalMoves", source)

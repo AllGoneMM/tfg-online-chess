@@ -1356,57 +1356,57 @@
     }
 
     function stopDraggedPiece(location) {
-    var action = 'drop';
-    if (location === 'offboard' && config.dropOffBoard === 'snapback') {
-        action = 'snapback';
-    }
-    if (location === 'offboard' && config.dropOffBoard === 'trash') {
-        action = 'trash';
-    }
-
-    if (isFunction(config.onDrop)) {
-        var newPosition = deepCopy(currentPosition);
-
-        if (draggedPieceSource === 'spare' && validSquare(location)) {
-            newPosition[location] = draggedPiece;
+        var action = 'drop';
+        if (location === 'offboard' && config.dropOffBoard === 'snapback') {
+            action = 'snapback';
+        }
+        if (location === 'offboard' && config.dropOffBoard === 'trash') {
+            action = 'trash';
         }
 
-        if (validSquare(draggedPieceSource) && location === 'offboard') {
-            delete newPosition[draggedPieceSource];
-        }
+        if (isFunction(config.onDrop)) {
+            var newPosition = deepCopy(currentPosition);
 
-        if (validSquare(draggedPieceSource) && validSquare(location)) {
-            delete newPosition[draggedPieceSource];
-            newPosition[location] = draggedPiece;
-        }
-
-        var oldPosition = deepCopy(currentPosition);
-
-        config.onDrop(
-            draggedPieceSource,
-            location,
-            draggedPiece,
-            newPosition,
-            oldPosition,
-            currentOrientation
-        ).then(result => {
-            if (result === 'snapback' || result === 'trash') {
-                action = result;
+            if (draggedPieceSource === 'spare' && validSquare(location)) {
+                newPosition[location] = draggedPiece;
             }
 
-            if (action === 'snapback') {
+            if (validSquare(draggedPieceSource) && location === 'offboard') {
+                delete newPosition[draggedPieceSource];
+            }
+
+            if (validSquare(draggedPieceSource) && validSquare(location)) {
+                delete newPosition[draggedPieceSource];
+                newPosition[location] = draggedPiece;
+            }
+
+            var oldPosition = deepCopy(currentPosition);
+
+            config.onDrop(
+                draggedPieceSource,
+                location,
+                draggedPiece,
+                newPosition,
+                oldPosition,
+                currentOrientation
+            ).then(result => {
+                if (result === 'snapback' || result === 'trash') {
+                    action = result;
+                }
+
+                if (action === 'snapback') {
+                    snapbackDraggedPiece();
+                } else if (action === 'trash') {
+                    trashDraggedPiece();
+                } else if (action === 'drop') {
+                    dropDraggedPieceOnSquare(location);
+                }
+            }).catch(err => {
+                console.error("Error during onDrop:", err);
                 snapbackDraggedPiece();
-            } else if (action === 'trash') {
-                trashDraggedPiece();
-            } else if (action === 'drop') {
-                dropDraggedPieceOnSquare(location);
-            }
-        }).catch(err => {
-            console.error("Error during onDrop:", err);
-            snapbackDraggedPiece();
-        });
+            });
+        }
     }
-}
 
     // -------------------------------------------------------------------------
     // Public Methods
