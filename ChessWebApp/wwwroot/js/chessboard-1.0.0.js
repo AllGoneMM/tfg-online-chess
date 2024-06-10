@@ -1276,11 +1276,11 @@
       isDragging = false
     }
 
-    function beginDraggingPiece (source, piece, x, y) {
+    async function beginDraggingPiece (source, piece, x, y) {
       // run their custom onDragStart function
       // their custom onDragStart function can cancel drag start
       if (isFunction(config.onDragStart) &&
-          config.onDragStart(source, piece, deepCopy(currentPosition), currentOrientation) === false) {
+          await config.onDragStart(source, piece, deepCopy(currentPosition), currentOrientation) === false) {
         return
       }
 

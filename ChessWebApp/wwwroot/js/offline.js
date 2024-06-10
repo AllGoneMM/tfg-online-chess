@@ -51,6 +51,14 @@ async function onDrop(source, target, piece, newPos, oldPos, orientation) {
 }
 function onSnapEnd() {
     chessBoard.position(chessGame);
+    signalRConnection.invoke("GetStockfishMove")
+        .then((response) => {
+            chessBoard.position(response);
+        })
+        .catch((error) => {
+            console.error("Error processing move:", error);
+            return 'snapback';
+        });
 }
 function removeGreySquares() {
     $('#chessBoard .square-55d63').css('background', '')
