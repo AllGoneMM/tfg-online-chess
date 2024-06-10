@@ -1,4 +1,6 @@
 using System.Globalization;
+using ChessLibrary;
+using ChessWebApp.Hubs;
 using ChessWebApp.Identity;
 using ChessWebApp.Models.ViewModels;
 using Microsoft.AspNetCore.Identity;
@@ -55,7 +57,8 @@ namespace ChessWebApp
                 .AddUserStore<UserStore<ChessUser, ChessRole, ChessIdentityDbContext>>()
                 .AddUserStore<UserStore<ChessUser, ChessRole, ChessIdentityDbContext>>()
                 .AddRoleStore<RoleStore<ChessRole, ChessIdentityDbContext>>();
-
+            builder.Services.AddSignalR();
+            builder.Services.AddSingleton<ChessGame>();
             var app = builder.Build();
             app.UseRequestLocalization();
             // Configure the HTTP request pipeline.
@@ -65,6 +68,7 @@ namespace ChessWebApp
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            app.MapHub<OfflineGameHub>("/hubs/offlinegame");
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

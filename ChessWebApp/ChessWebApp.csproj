@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\css\offline.css" />
     <_ContentIncludedByDefault Remove="wwwroot\js\login.js" />
     <_ContentIncludedByDefault Remove="wwwroot\js\root.js" />
   </ItemGroup>
@@ -34,6 +35,10 @@
     <None Include="wwwroot\js\root.js" />
     <None Include="wwwroot\lib\chessboardjs\js\chessboard-1.0.0.js" />
     <None Include="wwwroot\lib\chessboardjs\js\chessboard-1.0.0.min.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\tfg-chess\ChessLibrary\ChessLibrary.csproj" />
   </ItemGroup>
 
 </Project>
