@@ -28,13 +28,13 @@ document.addEventListener('DOMContentLoaded', async function () {
                 });
             })
             .catch((error) => {
-                window.alert("Error al iniciar la partida "+error.toString());
+                window.alert("Error al iniciar la partida " + error.toString());
             });
     });
 });
 
 async function onDrop(source, target, piece, newPos, oldPos, orientation) {
-    removeGreySquares();
+    await removeGreySquares();
     let move = source + target;
     return await signalRConnection.invoke("ProcessMove", move)
         .then((response) => {
@@ -49,7 +49,7 @@ async function onDrop(source, target, piece, newPos, oldPos, orientation) {
             return 'snapback';
         });
 }
-function onSnapEnd() {
+async function onSnapEnd() {
     chessBoard.position(chessGame);
     signalRConnection.invoke("GetStockfishMove")
         .then((response) => {
@@ -60,7 +60,7 @@ function onSnapEnd() {
             return 'snapback';
         });
 }
-function removeGreySquares() {
+async function removeGreySquares() {
     $('#chessBoard .square-55d63').css('background', '')
 }
 
@@ -85,6 +85,5 @@ function greySquare(square) {
     if ($square.hasClass('black-3c85d')) {
         background = '#696969';
     }
-
     $square.css('background', background);
 }
