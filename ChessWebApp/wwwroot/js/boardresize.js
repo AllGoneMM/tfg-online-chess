@@ -1,15 +1,15 @@
-﻿document.addEventListener("DOMContentLoaded", function () {
+﻿document.addEventListener("DOMContentLoaded", async function () {
     chessBoard = Chessboard('chessBoard', {
         pieceTheme: 'assets/img/chesspieces/{piece}.png',
         position: 'start'
     });
     adjustContentHeight();
-    chessBoard.resize();
+    await chessBoard.resize();
 });
 
-window.addEventListener('resize', function () {
+window.addEventListener('resize', async function () {
     adjustContentHeight();
-    chessBoard.resize();
+    await chessBoard.resize();
 });
 
 function adjustContentHeight() {
@@ -21,9 +21,9 @@ function adjustContentHeight() {
     let marginBottom = parseInt(computedStyle.marginBottom);
     let differenceHeight = chessBoardPlayersContainer.offsetHeight - rowContent.offsetHeight;
 
-    let maxHeight = "calc(100vh - " + navbarHeight + "px - " + marginTop + "px - " + marginBottom + "px - " + differenceHeight + "px)";
-    let maxWidth = "calc(100vh - " + navbarHeight + "px - " + marginTop + "px - " + marginBottom + "px - " + differenceHeight + "px)";
-
+    let maxHeight = "calc(100dvh - " + navbarHeight + "px - " + marginTop + "px - " + marginBottom + "px - " + differenceHeight + "px)";
+    let maxWidth = "calc(100dvh - " + navbarHeight + "px - " + marginTop + "px - " + marginBottom + "px - " + differenceHeight + "px)";
+    
     rowContent.style.maxHeight = maxHeight;
     rowContent.style.maxWidth = maxWidth;
 
@@ -31,4 +31,7 @@ function adjustContentHeight() {
     let div2 = document.getElementById('div2');
     div1.style.width = rowContent.offsetWidth + "px";
     div2.style.width = rowContent.offsetWidth + "px";
+
+    let mainContainer = document.getElementById('mainContainer');
+    rowContent.style.height = mainContainer.offsetHeight - navbarHeight + "px";
 }

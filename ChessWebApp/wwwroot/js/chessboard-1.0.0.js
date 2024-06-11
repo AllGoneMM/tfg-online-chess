@@ -1242,79 +1242,80 @@
       isDragging = false
     }
 
-    function dropDraggedPieceOnSquare (square) {
-      removeSquareHighlights()
+      async function dropDraggedPieceOnSquare(square) {
+          removeSquareHighlights();
 
-      // update position
-      var newPosition = deepCopy(currentPosition)
-      delete newPosition[draggedPieceSource]
-      newPosition[square] = draggedPiece
-      setCurrentPosition(newPosition)
+          // update position
+          var newPosition = deepCopy(currentPosition);
+          delete newPosition[draggedPieceSource];
+          newPosition[square] = draggedPiece;
+          setCurrentPosition(newPosition);
 
-      // get target square information
-      var targetSquarePosition = $('#' + squareElsIds[square]).offset()
+          // get target square information
+          var targetSquarePosition = $('#' + squareElsIds[square]).offset();
 
-      // animation complete
-      function onAnimationComplete () {
-        drawPositionInstant()
-        $draggedPiece.css('display', 'none')
+          // animation complete
+          async function onAnimationComplete() {
+              drawPositionInstant();
+              $draggedPiece.css('display', 'none');
 
-        // execute their onSnapEnd function
-        if (isFunction(config.onSnapEnd)) {
-          config.onSnapEnd(draggedPieceSource, square, draggedPiece)
-        }
+              // execute their onSnapEnd function
+              if (isFunction(config.onSnapEnd)) {
+                  await config.onSnapEnd(draggedPieceSource, square, draggedPiece);
+              }
+          }
+
+          // snap the piece to the target square
+          var opts = {
+              duration: config.snapSpeed,
+              complete: onAnimationComplete
+          };
+          $draggedPiece.animate(targetSquarePosition, opts);
+
+          // set state
+          isDragging = false;
       }
 
-      // snap the piece to the target square
-      var opts = {
-        duration: config.snapSpeed,
-        complete: onAnimationComplete
+      async function beginDraggingPiece(source, piece, x, y) {
+          // run their custom onDragStart function
+          // their custom onDragStart function can cancel drag start
+          if (isFunction(config.onDragStart) &&
+              await config.onDragStart(source, piece, deepCopy(currentPosition), currentOrientation) === false) {
+              return;
+          }
+
+          // set state
+          isDragging = true;
+          draggedPiece = piece;
+          draggedPieceSource = source;
+
+          // if the piece came from spare pieces, location is offboard
+          if (source === 'spare') {
+              draggedPieceLocation = 'offboard';
+          } else {
+              draggedPieceLocation = source;
+          }
+
+          // capture the x, y coords of all squares in memory
+          captureSquareOffsets();
+
+          // create the dragged piece
+          $draggedPiece.attr('src', buildPieceImgSrc(piece)).css({
+              display: '',
+              position: 'absolute',
+              left: x - squareSize / 2,
+              top: y - squareSize / 2
+          });
+
+          if (source !== 'spare') {
+              // highlight the source square and hide the piece
+              $('#' + squareElsIds[source])
+                  .addClass(CSS.highlight1)
+                  .find('.' + CSS.piece)
+                  .css('display', 'none');
+          }
       }
-      $draggedPiece.animate(targetSquarePosition, opts)
 
-      // set state
-      isDragging = false
-    }
-
-    async function beginDraggingPiece (source, piece, x, y) {
-      // run their custom onDragStart function
-      // their custom onDragStart function can cancel drag start
-      if (isFunction(config.onDragStart) &&
-          await config.onDragStart(source, piece, deepCopy(currentPosition), currentOrientation) === false) {
-        return
-      }
-
-      // set state
-      isDragging = true
-      draggedPiece = piece
-      draggedPieceSource = source
-
-      // if the piece came from spare pieces, location is offboard
-      if (source === 'spare') {
-        draggedPieceLocation = 'offboard'
-      } else {
-        draggedPieceLocation = source
-      }
-
-      // capture the x, y coords of all squares in memory
-      captureSquareOffsets()
-
-      // create the dragged piece
-      $draggedPiece.attr('src', buildPieceImgSrc(piece)).css({
-        display: '',
-        position: 'absolute',
-        left: x - squareSize / 2,
-        top: y - squareSize / 2
-      })
-
-      if (source !== 'spare') {
-        // highlight the source square and hide the piece
-        $('#' + squareElsIds[source])
-          .addClass(CSS.highlight1)
-          .find('.' + CSS.piece)
-          .css('display', 'none')
-      }
-    }
 
     function updateDraggedPiece (x, y) {
       // put the dragged piece over the mouse cursor
@@ -1355,58 +1356,61 @@
       draggedPieceLocation = location
     }
 
-    function stopDraggedPiece(location) {
-        var action = 'drop';
-        if (location === 'offboard' && config.dropOffBoard === 'snapback') {
-            action = 'snapback';
-        }
-        if (location === 'offboard' && config.dropOffBoard === 'trash') {
-            action = 'trash';
-        }
+      async function stopDraggedPiece(location) {
+          // determine what the action should be
+          var action = 'drop';
+          if (location === 'offboard' && config.dropOffBoard === 'snapback') {
+              action = 'snapback';
+          }
+          if (location === 'offboard' && config.dropOffBoard === 'trash') {
+              action = 'trash';
+          }
 
-        if (isFunction(config.onDrop)) {
-            var newPosition = deepCopy(currentPosition);
+          // run their onDrop function, which can potentially change the drop action
+          if (isFunction(config.onDrop)) {
+              var newPosition = deepCopy(currentPosition);
 
-            if (draggedPieceSource === 'spare' && validSquare(location)) {
-                newPosition[location] = draggedPiece;
-            }
+              // source piece is a spare piece and position is off the board
+              if (draggedPieceSource === 'spare' && validSquare(location)) {
+                  newPosition[location] = draggedPiece;
+              }
 
-            if (validSquare(draggedPieceSource) && location === 'offboard') {
-                delete newPosition[draggedPieceSource];
-            }
+              // source piece was on the board and position is off the board
+              if (validSquare(draggedPieceSource) && location === 'offboard') {
+                  delete newPosition[draggedPieceSource];
+              }
 
-            if (validSquare(draggedPieceSource) && validSquare(location)) {
-                delete newPosition[draggedPieceSource];
-                newPosition[location] = draggedPiece;
-            }
+              // source piece was on the board and position is on the board
+              if (validSquare(draggedPieceSource) && validSquare(location)) {
+                  delete newPosition[draggedPieceSource];
+                  newPosition[location] = draggedPiece;
+              }
 
-            var oldPosition = deepCopy(currentPosition);
+              var oldPosition = deepCopy(currentPosition);
 
-            config.onDrop(
-                draggedPieceSource,
-                location,
-                draggedPiece,
-                newPosition,
-                oldPosition,
-                currentOrientation
-            ).then(result => {
-                if (result === 'snapback' || result === 'trash') {
-                    action = result;
-                }
+              var result = await config.onDrop(
+                  draggedPieceSource,
+                  location,
+                  draggedPiece,
+                  newPosition,
+                  oldPosition,
+                  currentOrientation
+              );
+              if (result === 'snapback' || result === 'trash') {
+                  action = result;
+              }
+          }
 
-                if (action === 'snapback') {
-                    snapbackDraggedPiece();
-                } else if (action === 'trash') {
-                    trashDraggedPiece();
-                } else if (action === 'drop') {
-                    dropDraggedPieceOnSquare(location);
-                }
-            }).catch(err => {
-                console.error("Error during onDrop:", err);
-                snapbackDraggedPiece();
-            });
-        }
-    }
+          // do it!
+          if (action === 'snapback') {
+              snapbackDraggedPiece();
+          } else if (action === 'trash') {
+              trashDraggedPiece();
+          } else if (action === 'drop') {
+              dropDraggedPieceOnSquare(location);
+          }
+      }
+
 
     // -------------------------------------------------------------------------
     // Public Methods

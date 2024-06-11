@@ -30,12 +30,13 @@ namespace ChessWebApp.Hubs
 
         public async Task<string> GetStockfishMove()
         {
-            IStockfish stockfishAI1 = new Stockfish.NET.Stockfish(@"C:\Users\shady\source\repos\tfg-chess\ChessLibrary.UITests\stockfish.exe");
+            IStockfish stockfish = new Stockfish.NET.Stockfish(@"C:\Users\Mykyta\source\repos\tfg-chess\ChessLibrary.UITests\stockfish.exe");
             ChessGame game = _gameService.GetOrCreateGame(Context.ConnectionId);
-            stockfishAI1.SetFenPosition(game.ToString());
-            game.Move(stockfishAI1.GetBestMove());
+            stockfish.SetFenPosition(game.ToString());
+            game.Move(stockfish.GetBestMove());
             return game.ToString();
         }
+
         public async Task<string> StartGame()
         {
             _gameService.RemoveGame(Context.ConnectionId);
@@ -52,17 +53,24 @@ namespace ChessWebApp.Hubs
         {
             ChessGame game = _gameService.GetOrCreateGame(Context.ConnectionId);
             game.SelectSquare(originSquare);
+
             var legalMoves = game.CurrentSquareMoves;
-            game.DeselectSquare();
             List<string> legalMovesString = new List<string>();
             foreach (Move move in legalMoves)
             {
-                string destinationSquare = move.ToString().Substring(2,2);
+                string destinationSquare = move.ToString().Substring(2, 2);
                 legalMovesString.Add(destinationSquare);
             }
 
+            // Deselect the square and log the state
+            game.DeselectSquare();
+            Console.WriteLine($"CurrentSquare after deselecting: {game.CurrentSquare}");
+
+            // Return the serialized legal moves
             return JsonSerializer.Serialize(legalMovesString);
         }
+
+
         public async Task<string> ProcessMove(string move)
         {
             try
@@ -84,7 +92,7 @@ namespace ChessWebApp.Hubs
                 }
                 else
                 {
-                    var response = new 
+                    var response = new
                     {
                         Success = false,
                         ErrorMessage = "Invalid move"

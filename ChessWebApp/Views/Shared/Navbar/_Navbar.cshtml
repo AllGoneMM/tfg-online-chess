@@ -4,34 +4,31 @@
     <div class="container-fluid">
         <div class="d-flex align-items-center gap-2">
             <a class="d-sm-none text-dark" data-bs-toggle="offcanvas" href="#navbarOffcanvas">
-                <i class="fa-solid fa-bars"></i>
+                <i class="fa-solid fa-bars fs-4"></i>
             </a>
             <a asp-action="Index" asp-controller="Home" class="navbar-brand p-0">
-                <div class="d-flex align-items-center gap-2 border border-1">
-                    <img src="~/assets/img/template.webp" alt="Logo" width="30" height="24" />
-                    <span class="d-none d-sm-block">BRAND</span>
+                <div class="d-flex align-items-center gap-1">
+                    <img src="~/assets/img/logo.svg" alt="Logo" width="30" height="35" />
+                    <span class="d-none d-sm-block fw-bold">TFG CHESS</span>
                 </div>
             </a>
         </div>
 
         <div class="offcanvas offcanvas-start w-75" id="navbarOffcanvas">
-            <div class="offcanvas-header border border-1">
-                <div class="d-flex align-items-center gap-2 border border-1">
-                    <img src="~/assets/img/template.webp" alt="Logo" width="30" height="24" />
-                    <span>BRAND</span>
+            <div class="offcanvas-header">
+                <div class="d-flex align-items-center gap-4">
+                    <img src="~/assets/img/logo.svg" alt="Logo" width="40" height="45" />
+                    <span class="fs-1 fw-bold">TFG CHESS</span>
                 </div>
                 <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
             </div>
             <div class="offcanvas-body">
-                <ul class="navbar-nav border border-1">
+                <ul class="navbar-nav navbar-nav-font">
                     <li class="nav-item">
-                        <a asp-action="Index" asp-controller="Home" class="nav-link active">@Localizer["Home"]</a>
+                        <a asp-active-controller-action="Home:Index" asp-active-class-add="active" asp-action="Index" asp-controller="Home" class="nav-link">@Localizer["Home"]</a>
                     </li>
                     <li class="nav-item">
-                        <a asp-active-controller-action="Home:Index" asp-active-class-add="active" class="nav-link">@Localizer["Link"] 2</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link">@Localizer["Link"] 3</a>
+                        <a asp-active-controller-action="Play:Online Offline" asp-active-class-add="active" class="nav-link">@Localizer["Play"]</a>
                     </li>
                 </ul>
             </div>

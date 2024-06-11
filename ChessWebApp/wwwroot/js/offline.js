@@ -1,6 +1,8 @@
 ﻿var chessBoard;
 var chessGame;
 var signalRConnection;
+var waiting;
+
 document.addEventListener('DOMContentLoaded', async function () {
     // Start the connection with OfflineGameHub
     signalRConnection = new signalR.HubConnectionBuilder()
@@ -18,9 +20,6 @@ document.addEventListener('DOMContentLoaded', async function () {
                 chessBoard = Chessboard('chessBoard', {
                     pieceTheme: 'assets/img/chesspieces/{piece}.png',
                     draggable: true,
-                    moveSpeed: 'slow',
-                    snapbackSpeed: 500,
-                    snapSpeed: 100,
                     position: 'start',
                     onDrop: onDrop,
                     onSnapEnd: onSnapEnd,
@@ -51,9 +50,11 @@ async function onDrop(source, target, piece, newPos, oldPos, orientation) {
 }
 async function onSnapEnd() {
     chessBoard.position(chessGame);
-    signalRConnection.invoke("GetStockfishMove")
+    waiting = true;
+    await signalRConnection.invoke("GetStockfishMove")
         .then((response) => {
             chessBoard.position(response);
+            waiting = false;
         })
         .catch((error) => {
             console.error("Error processing move:", error);
@@ -65,11 +66,15 @@ async function removeGreySquares() {
 }
 
 async function onDragStart(source, piece, position, orientation) {
+    if (waiting) {
+        return false;
+    }
     await signalRConnection.invoke("GetLegalMoves", source)
-        .then((response) => {
+        .then(async (response) => {
+            console.log("legal moves:" + response)
             response = JSON.parse(response);
             for (var i = 0; i < response.length; i++) {
-                greySquare(response[i]);
+                await greySquare(response[i]);
             }
         })
         .catch(() => {

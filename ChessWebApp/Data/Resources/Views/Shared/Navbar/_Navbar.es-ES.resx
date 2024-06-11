@@ -123,4 +123,7 @@
   <data name="Link" xml:space="preserve">
     <value>Enlace</value>
   </data>
+  <data name="Play" xml:space="preserve">
+    <value>Jugar</value>
+  </data>
 </root>

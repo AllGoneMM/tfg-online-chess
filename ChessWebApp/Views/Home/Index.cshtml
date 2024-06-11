@@ -3,19 +3,22 @@
     ViewData["Title"] = Localizer["Home"];
 }
 <div id="rowContent" class="row p-4 overflow-hidden">
-    <div class="col-6 d-none d-md-block bg-primary">
+    <div class="col-6 d-none d-md-block">
+        <img src="~/assets/img/home-index.jpg" style="object-fit:cover" class="img-fluid h-100 rounded shadow-lg"/>
     </div>
     <div class="col-12 col-md-6">
         <div class="d-flex flex-column h-100 w-100 justify-content-center gap-4">
-            <div class="text-center d-flex justify-content-center align-items-center flex-grow-1">
-                <h1 class="display-1 m-0" style="font-size: 6rem;">
-                    H1 Title
-                    <br>
-                    <small class="text-muted">Subtitle</small>
+            <div class="text-center d-flex flex-column justify-content-center align-items-center flex-grow-1">
+                <h1 class="display-2 m-0 fw-bold" style="font-size: 4.5rem;">
+                    @Localizer["Play chess"]
                 </h1>
+                <small class="text-muted display-6">@Localizer["Play online or offline for free"]</small>
             </div>
-            <a asp-action="Online" asp-controller="Play" class="btn btn-lg btn-outline-primary"><span class="display-4">@Localizer["Play online"]</span></a>
-            <a asp-action="Offline" asp-controller="Play" class="btn btn-lg btn-outline-secondary"><span class="display-4">@Localizer["Play offline"]</span></a>
+            <div class="align-self-end w-100">
+                <a asp-action="Online" asp-controller="Play" class="btn btn-lg btn-outline-primary w-100 mb-2 shadow-sm"><span class="display-4">@Localizer["Play online"]</span></a>
+                <a asp-action="Offline" asp-controller="Play" class="btn btn-lg btn-outline-secondary w-100 shadow-sm"><span class="display-4">@Localizer["Play offline"]</span></a>
+            </div>
+          
         </div>
     </div>
 </div>
