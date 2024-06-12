@@ -68,8 +68,7 @@ namespace ChessLibrary.Engine.Movement
         }
 
 
-
-
+        
 
         private void RemoveCheckMoves()
         {
@@ -85,7 +84,7 @@ namespace ChessLibrary.Engine.Movement
 
                 //RECORRE LA MESA DE COPIA Y VA GUARDANDO TODOS LOS MOVIMIENTOS LEGALES DE TODAS LAS PIEZAS ENEMIGAS
                 List<Move> allEnemyLegalMoves = GetAllEnemyMoves(enemyContext);
-
+                
 
                 //VUELVE A RECORRER LA COPIA DE LA MESA, POR CADA PIEZA ALIADA, DETECTA SI EL REY SE ENCUENTRA EN LA LISTA DE MOVIMIENTOS ENEMIGOS
                 List<Square> allAllySquares = enemyContext.Board.GetAllAllySquares(_context.Turn);
@@ -119,7 +118,7 @@ namespace ChessLibrary.Engine.Movement
                                 {
                                     if (kingTargetIndex == 62)
                                     {
-                                        if (whiteKingSideCastlingSquares.Contains(enemyMove.TargetIndex)) checkMoves.Add(move);
+                                        if(whiteKingSideCastlingSquares.Contains(enemyMove.TargetIndex)) checkMoves.Add(move); 
                                     }
                                     else if (kingTargetIndex == 58)
                                     {

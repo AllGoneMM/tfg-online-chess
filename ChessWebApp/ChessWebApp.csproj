@@ -39,7 +39,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\tfg-chess\ChessLibrary\ChessLibrary.csproj" />
+    <ProjectReference Include="..\ChessLibrary\ChessLibrary.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using System.Text.Json;
 using System.Threading.Tasks;
-using ChessWebApp.Services;
 using ChessLibrary.Models.Pieces;
+using ChessWebApp.Services;
 using ChessWebApp.Models.DTOs;
 
 namespace ChessWebApp.Hubs

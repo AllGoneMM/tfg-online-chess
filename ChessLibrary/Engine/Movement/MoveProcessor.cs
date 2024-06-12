@@ -145,68 +145,6 @@ namespace ChessLibrary.Engine.Movement
                     }
                 }
             }
-            // Si hay castling disponible, comprobamos si hemos capturado una torre
-            if (turn == PieceTeam.WHITE)
-            {
-                
-                if (context.KingSideCastlingBlack)
-                {
-                    if (move.TargetIndex == 7)
-                    {
-                        if (board.ContainsEnemyPiece(7, turn))
-                        {
-                            if (board.GetPiece(7).Type == PieceType.ROOK)
-                            {
-                                context.KingSideCastlingBlack = false;
-                            }
-                        }
-                    }
-                }
-
-                if (context.QueenSideCastlingBlack)
-                {
-                    if (move.TargetIndex == 0)
-                    {
-                        if (board.ContainsEnemyPiece(0, turn))
-                        {
-                            if (board.GetPiece(0).Type == PieceType.ROOK)
-                            {
-                                context.QueenSideCastlingBlack = false;
-                            }
-                        }
-                    }
-                }
-            }
-            else
-            {
-                if (context.KingSideCastlingWhite)
-                {
-                    if (move.TargetIndex == 63)
-                    {
-                        if (board.ContainsEnemyPiece(63, turn))
-                        {
-                            if (board.GetPiece(63).Type == PieceType.ROOK)
-                            {
-                                context.KingSideCastlingWhite = false;
-                            }
-                        }
-                    }
-                }
-
-                if (context.QueenSideCastlingWhite)
-                {
-                    if (move.TargetIndex == 56)
-                    {
-                        if (board.ContainsEnemyPiece(56, turn))
-                        {
-                            if (board.GetPiece(56).Type == PieceType.ROOK)
-                            {
-                                context.QueenSideCastlingWhite = false;
-                            }
-                        }
-                    }
-                }
-            }
 
             switch (move.MoveType)
             {
@@ -311,29 +249,7 @@ namespace ChessLibrary.Engine.Movement
             // Si hay jaque mate, ofrecemos la victoria al equipo contrario
             if (allLegalMoves.Count == 0)
             {
-                bool isCheckMate = false;
-                List<Move> enemyMoves = moveValidator.GetAllEnemyMoves(context);
-                foreach (var move in enemyMoves)
-                {
-                    int targetIndex = move.TargetIndex;
-                    if (context.Board.ContainsAllyPiece(targetIndex, context.Turn))
-                    {
-                        if (context.Board.GetPiece(targetIndex).Type == PieceType.KING)
-                        {
-                            isCheckMate = true;
-                            break;
-                        }
-                    }
-                }
-                if (isCheckMate)
-                {
-                    context.State = context.Turn == PieceTeam.WHITE ? State.WIN_BLACK : State.WIN_WHITE;
-                }
-                else
-                {
-                    context.State = State.DRAW_STALEMATE;
-                }
-
+                context.State = context.Turn == PieceTeam.WHITE ? State.WIN_BLACK : State.WIN_WHITE;
             }
 
             // TODO: Empate por ahogado => Para esto habría que modificar la detección de jaque mate para distinguirlo de ahogado
@@ -346,31 +262,8 @@ namespace ChessLibrary.Engine.Movement
             }
 
             // TODO: Empate por regla de los 3 movimientos repetidos
-            if (context.HalfMoveClock >= 9)
-            {
-                int repetitionCount = 1;
-                int historyCount = context.MoveHistory.Count();
 
-                string[] fenParts = context.ToString().Split(" ");
-                string fen = fenParts[0] + " " + fenParts[1] + " " + fenParts[2] + " " + fenParts[3];
-                string[] fenPartsHistory1 = context.MoveHistory[historyCount - 4].Item2.Split(" ");
-                string fenHistory1 = fenPartsHistory1[0] + " " + fenPartsHistory1[1] + " " + fenPartsHistory1[2] + " " + fenPartsHistory1[3];
-                if (fen == fenHistory1)
-                {
-                    repetitionCount++;
-                }
-                string[] fenPartsHistory2 = context.MoveHistory[historyCount - 8].Item2.Split(" ");
-                string fenHistory2 = fenPartsHistory2[0] + " " + fenPartsHistory2[1] + " " + fenPartsHistory2[2] + " " + fenPartsHistory2[3];
-                if (fenHistory1 == fenHistory2)
-                {
-                    repetitionCount++;
-                }
 
-                if (repetitionCount == 3)
-                {
-                    context.State = State.DRAW_THREEFOLD_REPETITION;
-                }
-            }
             // TODO: Empate por falta de material
             List<Piece> whitePieces = context.Board.GetAllWhitePieces();
             List<Piece> blackPieces = context.Board.GetAllBlackPieces();
