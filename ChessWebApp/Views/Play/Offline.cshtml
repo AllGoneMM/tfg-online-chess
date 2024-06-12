@@ -2,23 +2,23 @@
 @{
     ViewData["Title"] = Localizer["Play offline"];
 }
-<div id="mainContainer" class="row border-start border-end border-1 ps-lg-4">
-    <div class="col-12 col-lg-9 col-xl-8 pt-2 pb-2 pt-lg-3 pb-lg-3 pt-xl-4 pb-xl-4 shadow-lg bg-light rounded" id="chessBoardPlayersContainer">
-        <div class="mx-auto d-flex pb-2 pb-lg-3 pb-xl-4 gap-2 align-items-center" id="div1">
-            <div class="rounded rounded bg-danger" style="width:25px; height:25px;"></div>
-            <span class="fw-semibold">Opponent</span>
+<div id="mainContainer" class="row ps-lg-4">
+    <div class="col-12 col-lg-9 col-xl-8 pt-3 pb-3 shadow-lg rounded" id="chessBoardPlayersContainer">
+        <div class="mx-auto d-flex pb-3 gap-2 align-items-center" id="div1">
+            <div class="rounded rounded bg-danger border border-1 border-dark" style="width:25px; height:25px;"></div>
+            <span class="fw-semibold fs-6">Opponent</span>
         </div>
 
         <div class="mx-auto shadow-lg" id="chessBoard"></div>
 
-        <div class="mx-auto d-flex pt-2 pt-lg-3 pt-xl-4 gap-2 align-items-center" id="div2">
-            <div class="rounded rounded bg-success" style="width:25px; height:25px;"></div>
-            <span class="fw-semibold" asp-authenticated="true">@User.Identity.Name</span>
-            <span class="fw-semibold" asp-authenticated="false">Guest</span>
+        <div class="mx-auto d-flex pt-3 gap-2 align-items-center" id="div2">
+            <div class="rounded rounded bg-success border border-1 border-dark" style="width:25px; height:25px;"></div>
+            <span class="fw-semibold fs-6" asp-authenticated="true">@User.Identity.Name</span>
+            <span class="fw-semibold fs-6" asp-authenticated="false">Guest</span>
         </div>
     </div>
-    <div class="col-12 col-lg-3 col-xl-4 p-4">
-        <div class="d-flex h-100 flex-column p-4 shadow rounded" style="background-color:#e3e4e6;">
+    <div class="col-12 col-lg-3 col-xl-4 p-4" style="background-color:#efefef">
+        <div class="d-flex h-100 flex-column p-4 shadow-lg rounded" style="background-color:#e6ebea;">
             <div class="d-block h-100">
                 <form>
                     <legend class="text-center w-100 d-block">Configuración</legend>
@@ -31,7 +31,7 @@
 </div>
 
 <div class="modal fade" id="gameInfo" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="gameInfoTitle"></h1>

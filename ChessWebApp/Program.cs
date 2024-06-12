@@ -59,7 +59,8 @@ namespace ChessWebApp
                 .AddUserStore<UserStore<ChessUser, ChessRole, ChessIdentityDbContext>>()
                 .AddRoleStore<RoleStore<ChessRole, ChessIdentityDbContext>>();
             builder.Services.AddSignalR();
-            builder.Services.AddSingleton<IGameService, GameService>();
+            builder.Services.AddSingleton<IOfflineGameService, OfflineGameService>();
+            builder.Services.AddSingleton<IOnlineGameService, OnlineGameService>();
             var app = builder.Build();
             app.UseRequestLocalization();
             // Configure the HTTP request pipeline.

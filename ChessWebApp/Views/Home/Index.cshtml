@@ -9,14 +9,14 @@
     <div class="col-12 col-md-6">
         <div class="d-flex flex-column h-100 w-100 justify-content-center gap-4">
             <div class="text-center d-flex flex-column justify-content-center align-items-center flex-grow-1">
-                <h1 class="display-2 m-0 fw-bold" style="font-size: 4.5rem;">
+                <h1 class="display-2 m-0 fw-bold text-success" style="font-size: 4.5rem;">
                     @Localizer["Play chess"]
                 </h1>
-                <small class="text-muted display-6">@Localizer["Play online or offline for free"]</small>
+                <small class="text-muted display-6">@Localizer["TFG chess web app"]</small>
             </div>
             <div class="align-self-end w-100">
-                <a asp-action="Online" asp-controller="Play" class="btn btn-lg btn-outline-primary w-100 mb-2 shadow-sm"><span class="display-4">@Localizer["Play online"]</span></a>
-                <a asp-action="Offline" asp-controller="Play" class="btn btn-lg btn-outline-secondary w-100 shadow-sm"><span class="display-4">@Localizer["Play offline"]</span></a>
+                <a asp-action="Online" asp-controller="Play" class="btn btn-lg btn-outline-success w-100 mb-2 shadow-sm d-flex justify-content-start align-items-center"><i class="fa-solid fa-earth-americas display-4"></i><span class="display-4 flex-grow-1">@Localizer["Play online"]</span></a>
+                <a asp-action="Offline" asp-controller="Play" class="btn btn-lg btn-outline-secondary w-100 shadow-sm d-flex justify-content-start align-items-center"><i class="fa-solid fa-computer display-4"></i><span class="display-4 flex-grow-1">@Localizer["Play against AI"]</span></a>
             </div>
           
         </div>

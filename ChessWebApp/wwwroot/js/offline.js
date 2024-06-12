@@ -127,8 +127,11 @@ function onSnapEnd() {
 }
 
 
-async function removeGreySquares() {
-    $('#chessBoard .square-55d63').css('background', '')
+function removeGreySquares() {
+    $('#chessBoard .greyed-square, #chessBoard .enemy-piece').each(function () {
+        var $square = $(this);
+        $square.removeClass('greyed-square enemy-piece').css('background', '');
+    });
 }
 
 async function onDragStart(source, piece, position, orientation) {
@@ -192,13 +195,10 @@ function greySquare(square) {
     var $square = $('#chessBoard .square-' + square);
 
     if (isEnemyPiece(square, playerTeam)) {
-        $square.css('background', '#dc3545');
+        $square.addClass('enemy-piece'); // Add class for enemy pieces
     } else {
-        var background = '#a9a9a9';
-        if ($square.hasClass('black-3c85d')) {
-            background = '#696969';
-        }
-        $square.css('background', background);
+        $square.addClass('greyed-square'); // Add class for greyed squares
     }
 }
+
 

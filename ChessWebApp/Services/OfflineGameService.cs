@@ -8,14 +8,14 @@ using Stockfish.NET;
 
 namespace ChessWebApp.Services
 {
-    public class GameService : IGameService
+    public class OfflineGameService : IOfflineGameService
     {
         private readonly ConcurrentDictionary<string, ChessGame> _games;
         private readonly ConcurrentDictionary<string, PlayerInfo> _players;
-        private readonly ILogger<GameService> _logger;
+        private readonly ILogger<OfflineGameService> _logger;
         private readonly string _stockfishPath;
 
-        public GameService(ILogger<GameService> logger, IConfiguration configuration)
+        public OfflineGameService(ILogger<OfflineGameService> logger, IConfiguration configuration)
         {
             _games = new ConcurrentDictionary<string, ChessGame>();
             _players = new ConcurrentDictionary<string, PlayerInfo>();

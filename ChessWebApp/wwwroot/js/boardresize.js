@@ -27,6 +27,7 @@ async function adjustContentHeight() {
     rowContent.style.maxHeight = maxHeight;
     rowContent.style.maxWidth = maxWidth;
 
+
     let div1 = document.getElementById('div1');
     let div2 = document.getElementById('div2');
     div1.style.width = rowContent.offsetWidth + "px";

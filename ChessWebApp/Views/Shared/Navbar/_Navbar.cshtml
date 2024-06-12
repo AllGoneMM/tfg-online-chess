@@ -1,10 +1,10 @@
 ﻿@inject IViewLocalizer Localizer
 
-<nav asp-active-controller-action="Account:LogIn SignUp" asp-active-add="false" id="navbar" class="navbar navbar-expand-sm border border-1">
+<nav asp-active-controller-action="Account:LogIn SignUp" asp-active-add="false" id="navbar" class="navbar navbar-dark navbar-expand-sm bg-dark">
     <div class="container-fluid">
         <div class="d-flex align-items-center gap-2">
             <a class="d-sm-none text-dark" data-bs-toggle="offcanvas" href="#navbarOffcanvas">
-                <i class="fa-solid fa-bars fs-4"></i>
+                <i class="fa-solid fa-bars fs-4 text-white"></i>
             </a>
             <a asp-action="Index" asp-controller="Home" class="navbar-brand p-0">
                 <div class="d-flex align-items-center gap-1">
@@ -14,22 +14,28 @@
             </a>
         </div>
 
-        <div class="offcanvas offcanvas-start w-75" id="navbarOffcanvas">
+        <div class="offcanvas offcanvas-start w-75 bg-dark" id="navbarOffcanvas">
             <div class="offcanvas-header">
                 <div class="d-flex align-items-center gap-4">
                     <img src="~/assets/img/logo.svg" alt="Logo" width="40" height="45" />
-                    <span class="fs-1 fw-bold">TFG CHESS</span>
+                    <span class="fs-1 fw-bold text-white">TFG CHESS</span>
                 </div>
-                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+                <button type="button" class="btn-close btn-close-white text-reset" data-bs-dismiss="offcanvas"></button>
             </div>
             <div class="offcanvas-body">
                 <ul class="navbar-nav navbar-nav-font">
                     <li class="nav-item">
                         <a asp-active-controller-action="Home:Index" asp-active-class-add="active" asp-action="Index" asp-controller="Home" class="nav-link">@Localizer["Home"]</a>
                     </li>
-                    <li class="nav-item">
-                        <a asp-active-controller-action="Play:Online Offline" asp-active-class-add="active" class="nav-link">@Localizer["Play"]</a>
+                    <li class="nav-item dropdown-center">
+                        <a asp-active-controller-action="Play:Online Offline" asp-active-class-add="active" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">@Localizer["Play"]</a>
+
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a asp-action="Online" asp-controller="Play" asp-active-controller-action="Play:Online" asp-active-class-add="active" class="dropdown-item">Online</a></li>
+                            <li><a asp-action="Offline" asp-controller="Play" asp-active-controller-action="Play:Offline" asp-active-class-add="active" class="dropdown-item">Offline</a></li>
+                        </ul>
                     </li>
+
                 </ul>
             </div>
         </div>

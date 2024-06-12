@@ -1,142 +1,108 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Threading.Tasks;
-using ChessLibrary;
-using ChessLibrary.Engine.Movement;
-using ChessLibrary.Models.Pieces;
+using ChessWebApp.Models.DTOs;
+using ChessWebApp.Services;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 
 namespace ChessWebApp.Hubs
 {
     public class OnlineGameHub : Hub
     {
-        private static readonly ConcurrentDictionary<string, string> _connectionIdToGroup = new ConcurrentDictionary<string, string>();
-        private static readonly ConcurrentDictionary<string, ChessGame> _groupToGame = new ConcurrentDictionary<string, ChessGame>();
-        private static readonly ConcurrentDictionary<string, string> _connectionIdToColor = new ConcurrentDictionary<string, string>();
-        private static ConcurrentQueue<string> _waitingPlayers = new ConcurrentQueue<string>();
+        private readonly IOnlineGameService _onlineGameService;
+        private readonly ILogger<OnlineGameHub> _logger;
 
-        public async Task JoinQueue()
+        public OnlineGameHub(IOnlineGameService onlineGameService, ILogger<OnlineGameHub> logger)
         {
-            _waitingPlayers.Enqueue(Context.ConnectionId);
-            await TryStartGame();
+            _onlineGameService = onlineGameService;
+            _logger = logger;
         }
 
-        private async Task TryStartGame()
+        public override async Task OnConnectedAsync()
         {
-            if (_waitingPlayers.Count >= 2)
+            _logger.LogInformation("Client connected: {ConnectionId}", Context.ConnectionId);
+            await JoinQueue();
+            await base.OnConnectedAsync();
+        }
+
+        public override async Task OnDisconnectedAsync(Exception exception)
+        {
+            await _onlineGameService.LeaveGame(Context.ConnectionId);
+            _logger.LogInformation("Client disconnected: {ConnectionId}", Context.ConnectionId);
+            await base.OnDisconnectedAsync(exception);
+        }
+
+        private async Task JoinQueue()
+        {
+            PlayerInfo playerInfo = new PlayerInfo
             {
-                string player1, player2;
-                if (_waitingPlayers.TryDequeue(out player1) && _waitingPlayers.TryDequeue(out player2))
+                ConnectionId = Context.ConnectionId
+            };
+
+            if (Context.User.Identity.IsAuthenticated)
+            {
+                playerInfo.Username = Context.User.Identity.Name;
+            }
+            else
+            {
+                playerInfo.Username = "Guest";
+            }
+
+            var dictionary = await _onlineGameService.JoinQueue(playerInfo);
+
+            if (dictionary.Count == 2)
+            {
+                foreach (var kvp in dictionary)
                 {
-                    string group = Guid.NewGuid().ToString();
-                    await Groups.AddToGroupAsync(player1, group);
-                    await Groups.AddToGroupAsync(player2, group);
+                    var key = kvp.Key;
+                    var value = kvp.Value;
 
-                    _connectionIdToGroup[player1] = group;
-                    _connectionIdToGroup[player2] = group;
-
-                    AssignPlayerColor(player1, "White");
-                    AssignPlayerColor(player2, "Black");
-
-                    var game = new ChessGame();
-                    _groupToGame[group] = game;
-
-                    // Optionally, you can send some initial game state to both players
-                    await Clients.Group(group).SendAsync("StartGame", game.ToString());
+                    if (value.Item1 != null && value.Item2 != null)
+                    {
+                        var gameInfoJson = JsonSerializer.Serialize(value.Item2);
+                        var gameResponseJson = JsonSerializer.Serialize(value.Item1);
+                        await Clients.Client(kvp.Key).SendAsync("ReceiveGameInfo", gameResponseJson, gameInfoJson);
+                    }
                 }
             }
-        }
-
-        private void AssignPlayerColor(string connectionId, string color)
-        {
-            _connectionIdToColor[connectionId] = color;
         }
 
         public async Task LeaveQueue()
         {
-            string removedPlayer;
-            var newQueue = new ConcurrentQueue<string>();
-
-            while (_waitingPlayers.TryDequeue(out removedPlayer))
-            {
-                if (removedPlayer != Context.ConnectionId)
-                {
-                    newQueue.Enqueue(removedPlayer);
-                }
-            }
-
-            _waitingPlayers = newQueue;
+            await _onlineGameService.LeaveQueue(Context.ConnectionId);
         }
 
         public async Task LeaveGame()
         {
-            if (_connectionIdToGroup.TryGetValue(Context.ConnectionId, out var group))
-            {
-                await Groups.RemoveFromGroupAsync(Context.ConnectionId, group);
-                _connectionIdToGroup.TryRemove(Context.ConnectionId, out _);
-                _connectionIdToColor.TryRemove(Context.ConnectionId, out _);
-            }
+            await _onlineGameService.LeaveGame(Context.ConnectionId);
         }
 
-        public async Task SendMove(string move)
+        public async Task<string> ProcessMove(string move)
         {
-            if (_connectionIdToGroup.TryGetValue(Context.ConnectionId, out var group))
+            var response = _onlineGameService.ProcessMove(Context.ConnectionId, move);
+            if (response.Item1.MoveResult != null && response.Item1.MoveResult.IsSuccessful())
             {
-                if (_groupToGame.TryGetValue(group, out var game))
-                {
-                    // Check if it's the turn of the player making the move
-                    string playerColor = _connectionIdToColor[Context.ConnectionId];
-                    string currentTurnColor = game.Turn == PieceTeam.WHITE ? "White" : "Black";
+                // Retrieve the group the player belongs to
+                string group = _onlineGameService.GetGroup(Context.ConnectionId);
 
-                    if (playerColor == currentTurnColor)
+                if (!string.IsNullOrEmpty(group))
+                {
+                    // Get the opponent's connection ID
+                    var playersInGroup = _onlineGameService.GetPlayersInGroup(group);
+                    var opponentConnectionId = playersInGroup.FirstOrDefault(id => id != Context.ConnectionId);
+
+                    if (opponentConnectionId != null)
                     {
-                        MoveResult result = game.Move(move);
-                        if (result.IsSuccessful())
-                        {
-                            await Clients.Group(group).SendAsync("ReceiveMove", game.ToString());
-                        }
-                        else
-                        {
-                            // Handle invalid move
-                            await Clients.Caller.SendAsync("InvalidMove", game.ToString());
-                        }
-                    }
-                    else
-                    {
-                        // Notify the player that it's not their turn
-                        await Clients.Caller.SendAsync("NotYourTurn", game.ToString());
+                        string opponentResponseJson = JsonSerializer.Serialize(response.Item2);
+                        // Send the move to the opponent
+                        await Clients.Client(opponentConnectionId).SendAsync("ReceiveOpponentPlayerMove", opponentResponseJson);
                     }
                 }
             }
+
+            string responseJson = JsonSerializer.Serialize(response.Item1);
+            return responseJson;
         }
 
-        public async Task<string> GetLegalMoves(string originSquare)
-        {
-            if (_connectionIdToGroup.TryGetValue(Context.ConnectionId, out var group))
-            {
-                if (_groupToGame.TryGetValue(group, out var game))
-                {
-                    game.SelectSquare(originSquare);
-
-                    var legalMoves = game.CurrentSquareMoves;
-                    List<string> legalMovesString = new List<string>();
-                    foreach (Move move in legalMoves)
-                    {
-                        string destinationSquare = move.ToString().Substring(2, 2);
-                        legalMovesString.Add(destinationSquare);
-                    }
-
-                    // Deselect the square and log the state
-                    game.DeselectSquare();
-                    Console.WriteLine($"CurrentSquare after deselecting: {game.CurrentSquare}");
-
-                    // Return the serialized legal moves
-                    return JsonSerializer.Serialize(legalMovesString);
-                }
-            }
-            return JsonSerializer.Serialize(new List<string>());
-        }
     }
 }

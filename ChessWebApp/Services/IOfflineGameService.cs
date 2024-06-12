@@ -3,7 +3,7 @@ using ChessWebApp.Models.DTOs;
 
 namespace ChessWebApp.Services
 {
-    public interface IGameService
+    public interface IOfflineGameService
     {
         void TryRemoveGame(string connectionId);
         void TryRemovePlayer(string connectionId);

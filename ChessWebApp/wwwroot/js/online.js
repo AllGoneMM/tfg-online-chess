@@ -1,116 +1,220 @@
 ﻿var chessBoard;
 var chessGame;
+var gameInfo;
+var playerTeam;
 var signalRConnection;
-var waiting;
 
+const State = Object.freeze({
+    NONE: 0,
+    IN_PROGRESS: 1,
+    WIN_WHITE: 2,
+    WIN_BLACK: 3,
+    DRAW_STALEMATE: 4,
+    DRAW_THREEFOLD_REPETITION: 5,
+    DRAW_FIFTY_MOVE_RULE: 6,
+    DRAW_INSUFFICIENT_MATERIAL: 7,
+});
+
+const PieceTeam = Object.freeze({
+    NONE: 0,
+    WHITE: 1,
+    BLACK: 2
+});
+
+const PieceTeamText = Object.freeze({
+    0: 'NONE',
+    1: 'white',
+    2: 'black'
+});
+
+const StateText = Object.freeze({
+    0: 'NONE',
+    1: 'IN_PROGRESS',
+    2: 'WIN_WHITE',
+    3: 'WIN_BLACK',
+    4: 'DRAW_STALEMATE',
+    5: 'DRAW_THREEFOLD_REPETITION',
+    6: 'DRAW_FIFTY_MOVE_RULE',
+    7: 'DRAW_INSUFFICIENT_MATERIAL'
+});
 document.addEventListener('DOMContentLoaded', async function () {
-    // Inicia la conexión con el hub del juego online
+
+    // Define the connection with OnlineGameHub
     signalRConnection = new signalR.HubConnectionBuilder()
         .withUrl("/hubs/onlinegame", signalR.HttpTransportType.WebSockets)
         .withAutomaticReconnect()
         .build();
 
-    signalRConnection.start()
-        .catch(error => alert("Error al conectar con el servidor"));
+    // Event listener for entering the queue
+    document.getElementById("queueUP").addEventListener("click", async function () {
+        chessGame = null;
+        gameInfo = null;
 
-    // Event listener para el botón de iniciar juego
-    document.getElementById("startGame").addEventListener("click", async function () {
-        try {
-            await signalRConnection.invoke("JoinQueue"); // Unirse a la cola
-            chessBoard = Chessboard('chessBoard', {
-                pieceTheme: 'assets/img/chesspieces/{piece}.png',
-                draggable: true,
-                position: 'start',
-                onDrop: onDrop,
-                onSnapEnd: onSnapEnd,
-                onDragStart: onDragStart
+        // When a game is found, the server will send game state including the player's team, opponent information and the initial board state
+        signalRConnection.on("ReceiveGameInfo",
+            (response, gameInfo) => {
+
+                // TODO: Implement opponent info loading
+
+                chessGame = JSON.parse(response);
+                gameInfo = JSON.parse(gameInfo);
+                playerTeam = gameInfo.PlayerInformation.Team;
+
+                chessBoard = Chessboard('chessBoard',
+                    {
+                        pieceTheme: 'assets/img/chesspieces/{piece}.png',
+                        draggable: true,
+                        position: 'start',
+                        onDrop: onDrop,
+                        onSnapEnd: onSnapEnd,
+                        onDragStart: onDragStart,
+                        orientation: PieceTeamText[playerTeam]
+                    });
+
+                if (chessGame.LegalMoves) {
+                    chessGame.LegalMoves = transformLegalMovesToDictionary(chessGame.LegalMoves);
+                    console.log(chessGame.LegalMoves);
+                }
             });
-        } catch (err) {
-            alert("Error al unirse a la cola: " + err.toString());
+           
+
+        // Event listener for the opponent's move
+        signalRConnection.on("ReceiveOpponentPlayerMove",
+            (response) => {
+                chessGame = JSON.parse(response);
+                if (chessGame.LegalMoves) {
+                    chessGame.LegalMoves = transformLegalMovesToDictionary(chessGame.LegalMoves);
+                }
+                chessBoard.position(chessGame.Fen);
+                if (chessGame.State !== State.IN_PROGRESS) {
+                    openModal();
+                };
+            });
+
+        // Enter the queue
+        if (signalRConnection.state !== signalR.HubConnectionState.Connected) {
+            await signalRConnection.start()
+                .catch((error) => {
+                    window.alert("Error al conectar cone el servidor");
+                });
         }
-    });
-
-    // Event listener para recibir movimientos del oponente
-    signalRConnection.on("ReceiveMove", function (fen) {
-        chessBoard.position(fen);
-        chessGame = fen;
-    });
-
-    // Event listener para manejar errores de movimientos inválidos
-    signalRConnection.on("InvalidMove", function (errorMessage) {
-    });
-
-    signalRConnection.on("NotYourTurn", function (errorMessage) {
     });
 });
 
-// Función para manejar el evento onDrop
 async function onDrop(source, target, piece, newPos, oldPos, orientation) {
     await removeGreySquares();
+
+    // Validación en lado del cliente
+    if (chessGame.LegalMoves) {
+        let legalMoves = chessGame.LegalMoves[source];
+        if (!legalMoves || legalMoves.indexOf(target) === -1) {
+            return 'snapback';
+        }
+    } else {
+        return 'snapback';
+    }
+
+    // Validación en lado del servidor
     let move = source + target;
-    return await signalRConnection.invoke("SendMove", move)
+    return await signalRConnection.invoke("ProcessMove", move)
         .then((response) => {
-            response = JSON.parse(response);
-            if (!response.Success) {
+            chessGame = JSON.parse(response);
+            if (!chessGame.MoveResult.MoveSquareResult.IsSuccessful) {
                 return 'snapback';
             }
-            chessGame = response.Fen;
-        })
-        .catch((error) => {
+            if (chessGame.State !== State.IN_PROGRESS) {
+                openModal();
+            };
+        }).catch((error) => {
             console.error("Error processing move:", error);
             return 'snapback';
         });
+
 }
 
-// Función para manejar el evento onSnapEnd
-async function onSnapEnd() {
-    chessBoard.position(chessGame);
-    waiting = true;
-    await signalRConnection.invoke("GetStockfishMove")
-        .then((response) => {
-            chessBoard.position(response);
-            chessGame = response;
-            waiting = false;
-        })
-        .catch((error) => {
-            console.error("Error processing move:", error);
-            return 'snapback';
-        });
+function onSnapEnd() {
+    chessBoard.position(chessGame.Fen);
 }
 
-// Función para remover los cuadros grises
-async function removeGreySquares() {
-    document.querySelectorAll('#chessBoard .square-55d63').forEach(square => {
-        square.style.background = '';
+async function onDragStart(source, piece, position, orientation) {
+    if (!chessGame || !chessGame.Turn || chessGame.Turn !== playerTeam) {
+        return false;
+    }
+
+    if ((playerTeam === 1 && piece.search(/^w/) === -1) ||
+        (playerTeam === 2 && piece.search(/^b/) === -1)) {
+        return false;
+    }
+    if (chessGame.LegalMoves) {
+        let sourceLegalMoves = chessGame.LegalMoves[source];
+        if (sourceLegalMoves) {
+            sourceLegalMoves.forEach((item) => {
+                greySquare(item);
+            });
+
+        }
+    }
+
+}
+
+function openModal() {
+    document.getElementById('gameInfoTitle').innerText = "Game Over";
+    document.getElementById('gameInfoBody').innerText = StateText[chessGame.State];
+    const gameInfo = new bootstrap.Modal(document.getElementById('gameInfo'));
+    gameInfo.show();
+}
+
+function convertIndexToChessNotation(squareIndex) {
+    // Calcula la columna de la casilla basándose en el índice de casilla.
+    const column = String.fromCharCode('a'.charCodeAt(0) + (squareIndex % 8));
+    // Calcula la fila de la casilla basándose en el índice de casilla.
+    const row = String.fromCharCode('8'.charCodeAt(0) - Math.floor(squareIndex / 8));
+    return `${column}${row}`;
+}
+
+function transformLegalMovesToDictionary(legalMoves) {
+    const result = {};
+
+    legalMoves.forEach(move => {
+        const origin = convertIndexToChessNotation(move.OriginIndex);
+        const target = convertIndexToChessNotation(move.TargetIndex);
+
+        if (!result[origin]) {
+            result[origin] = [];
+        }
+
+        result[origin].push(target);
+    });
+
+    return result;
+}
+
+function isEnemyPiece(square) {
+    var piece = $('#chessBoard .square-' + square).find('.piece-417db');
+    if (piece.length === 0) return false; // No hay pieza en la casilla
+
+    var pieceData = piece.data('piece');
+    if (playerTeam === 1) {
+        return pieceData && pieceData.startsWith('b'); // El jugador es blanco, la pieza enemiga es negra
+    } else {
+        return pieceData && pieceData.startsWith('w'); // El jugador es negro, la pieza enemiga es blanca
+    }
+}
+
+function greySquare(square) {
+    var $square = $('#chessBoard .square-' + square);
+
+    if (isEnemyPiece(square, playerTeam)) {
+        $square.addClass('enemy-piece'); // Add class for enemy pieces
+    } else {
+        $square.addClass('greyed-square'); // Add class for greyed squares
+    }
+}
+
+function removeGreySquares() {
+    $('#chessBoard .greyed-square, #chessBoard .enemy-piece').each(function () {
+        var $square = $(this);
+        $square.removeClass('greyed-square enemy-piece').css('background', '');
     });
 }
 
-// Función para manejar el evento onDragStart
-async function onDragStart(source, piece, position, orientation) {
-    if (waiting) {
-        return false;
-    }
-    await signalRConnection.invoke("GetLegalMoves", source)
-        .then(async (response) => {
-            console.log("Movimientos legales: " + response);
-            response = JSON.parse(response);
-            for (var i = 0; i < response.length; i++) {
-                await greySquare(response[i]);
-            }
-        })
-        .catch(() => {
-            alert("Error al obtener movimientos legales");
-            return 'snapback';
-        });
-}
-
-// Función para colorear los cuadros grises
-function greySquare(square) {
-    var $square = document.querySelector('#chessBoard .square-' + square);
-
-    var background = '#a9a9a9';
-    if ($square.classList.contains('black-3c85d')) {
-        background = '#696969';
-    }
-    $square.style.background = background;
-}

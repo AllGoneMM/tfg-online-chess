@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Logging;
-using System;
 using System.Text.Json;
 using System.Threading.Tasks;
 using ChessWebApp.Services;
@@ -11,10 +9,10 @@ namespace ChessWebApp.Hubs
 {
     public class OfflineGameHub : Hub
     {
-        private readonly IGameService _gameService;
+        private readonly IOfflineGameService _gameService;
         private readonly ILogger<OfflineGameHub> _logger;
 
-        public OfflineGameHub(IGameService gameService, ILogger<OfflineGameHub> logger)
+        public OfflineGameHub(IOfflineGameService gameService, ILogger<OfflineGameHub> logger)
         {
             _gameService = gameService;
             _logger = logger;
