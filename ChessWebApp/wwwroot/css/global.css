@@ -23,3 +23,33 @@ html {
         font-size: 25px !important;
     }
 }
+
+
+.indicator {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: grey;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.enemy-indicator {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    color: red;
+    font-size: 20px;
+    font-weight: bold;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    line-height: 20px;
+}
+.board-b72b1 {
+    border-width: 4px !important;
+    border-color: cornsilk !important;
+}

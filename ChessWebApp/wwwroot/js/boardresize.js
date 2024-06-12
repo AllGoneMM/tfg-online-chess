@@ -3,16 +3,16 @@
         pieceTheme: 'assets/img/chesspieces/{piece}.png',
         position: 'start'
     });
-    adjustContentHeight();
+    await adjustContentHeight();
     await chessBoard.resize();
 });
 
 window.addEventListener('resize', async function () {
-    adjustContentHeight();
+    await adjustContentHeight();
     await chessBoard.resize();
 });
 
-function adjustContentHeight() {
+async function adjustContentHeight() {
     var navbarHeight = document.getElementById('navbar').offsetHeight;
     let rowContent = document.getElementById('chessBoard');
     let chessBoardPlayersContainer = document.getElementById('chessBoardPlayersContainer');
@@ -31,7 +31,4 @@ function adjustContentHeight() {
     let div2 = document.getElementById('div2');
     div1.style.width = rowContent.offsetWidth + "px";
     div2.style.width = rowContent.offsetWidth + "px";
-
-    let mainContainer = document.getElementById('mainContainer');
-    rowContent.style.height = mainContainer.offsetHeight - navbarHeight + "px";
 }

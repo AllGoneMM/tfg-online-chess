@@ -1,116 +1,80 @@
-﻿using ChessLibrary;
-using ChessLibrary.Engine.Movement;
-using Microsoft.AspNetCore.SignalR;
-using Stockfish.NET;
+﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Text.Json;
+using System.Threading.Tasks;
 using ChessWebApp.Services;
+using ChessLibrary.Models.Pieces;
+using ChessWebApp.Models.DTOs;
 
 namespace ChessWebApp.Hubs
 {
     public class OfflineGameHub : Hub
     {
-        private readonly GameService _gameService;
+        private readonly IGameService _gameService;
+        private readonly ILogger<OfflineGameHub> _logger;
 
-        public OfflineGameHub(GameService gameService)
+        public OfflineGameHub(IGameService gameService, ILogger<OfflineGameHub> logger)
         {
             _gameService = gameService;
+            _logger = logger;
         }
 
-        public override Task OnConnectedAsync()
+        public override async Task OnConnectedAsync()
         {
-            _gameService.GetOrCreateGame(Context.ConnectionId);
-            return base.OnConnectedAsync();
+            // Handle the connection
+            _logger.LogInformation("Client connected: {ConnectionId}", Context.ConnectionId);
+            await base.OnConnectedAsync();
         }
 
-        public override Task OnDisconnectedAsync(Exception exception)
+        public override async Task OnDisconnectedAsync(Exception exception)
         {
-            _gameService.RemoveGame(Context.ConnectionId);
-            return base.OnDisconnectedAsync(exception);
+            _gameService.TryRemoveGame(Context.ConnectionId);
+            _gameService.TryRemovePlayer(Context.ConnectionId);
+            _logger.LogInformation("Client disconnected: {ConnectionId}", Context.ConnectionId);
+            await base.OnDisconnectedAsync(exception);
         }
 
-        public async Task<string> GetStockfishMove()
+        public async Task<string> StartGame(string color)
         {
-            IStockfish stockfish = new Stockfish.NET.Stockfish(@"C:\Users\Mykyta\source\repos\tfg-chess\ChessLibrary.UITests\stockfish.exe");
-            ChessGame game = _gameService.GetOrCreateGame(Context.ConnectionId);
-            stockfish.SetFenPosition(game.ToString());
-            game.Move(stockfish.GetBestMove());
-            return game.ToString();
-        }
-
-        public async Task<string> StartGame()
-        {
-            _gameService.RemoveGame(Context.ConnectionId);
-            ChessGame game = _gameService.GetOrCreateGame(Context.ConnectionId);
-            return JsonSerializer.Serialize(new
+            ChessGameResponse response = new ChessGameResponse();
+            
+            if(color != "white" && color != "black")
             {
-                Fen = game.ToString(),
-                State = game.State,
-                Promotion = game.Promotion
-            });
-        }
-
-        public async Task<string> GetLegalMoves(string originSquare)
-        {
-            ChessGame game = _gameService.GetOrCreateGame(Context.ConnectionId);
-            game.SelectSquare(originSquare);
-
-            var legalMoves = game.CurrentSquareMoves;
-            List<string> legalMovesString = new List<string>();
-            foreach (Move move in legalMoves)
-            {
-                string destinationSquare = move.ToString().Substring(2, 2);
-                legalMovesString.Add(destinationSquare);
+                response.ErrorMessage = "Invalid team";
+                return JsonSerializer.Serialize(response);
             }
 
-            // Deselect the square and log the state
-            game.DeselectSquare();
-            Console.WriteLine($"CurrentSquare after deselecting: {game.CurrentSquare}");
+            PieceTeam team = color == "white" ? PieceTeam.WHITE : PieceTeam.BLACK;
+            PlayerInfo playerInfo = new PlayerInfo();
+            playerInfo.ConnectionId = Context.ConnectionId;
+            playerInfo.Team = team;
+            if(Context.User.Identity.IsAuthenticated)
+            {
+                playerInfo.Username = Context.User.Identity.Name;
+            }
+            else
+            {
+                playerInfo.Username = "Guest";
+            }
 
-            // Return the serialized legal moves
-            return JsonSerializer.Serialize(legalMovesString);
+            response = _gameService.StartGame(playerInfo);
+            return JsonSerializer.Serialize(response);
         }
-
 
         public async Task<string> ProcessMove(string move)
         {
-            try
-            {
-                ChessGame game = _gameService.GetOrCreateGame(Context.ConnectionId);
+            ChessGameResponse response = _gameService.ProcessMove(Context.ConnectionId, move);
+            return JsonSerializer.Serialize(response);
+        }
 
-                MoveResult result = game.Move(move);
-                if (result.IsSuccessful())
-                {
-                    var response = new
-                    {
-                        Success = true,
-                        Fen = game.ToString(),
-                        State = game.State,
-                        Promotion = game.Promotion
-                    };
+        public async Task GetStockfishMove()
+        {
+            ChessGameResponse response = _gameService.GetStockfishMove(Context.ConnectionId);
+            string responseJson = JsonSerializer.Serialize(response);
 
-                    return JsonSerializer.Serialize(response);
-                }
-                else
-                {
-                    var response = new
-                    {
-                        Success = false,
-                        ErrorMessage = "Invalid move"
-                    };
-
-                    return JsonSerializer.Serialize(response);
-                }
-            }
-            catch (Exception ex)
-            {
-                var response = new
-                {
-                    Success = false,
-                    ErrorMessage = ex.Message
-                };
-
-                return JsonSerializer.Serialize(response);
-            }
+            // Invocar método en el cliente
+            await Clients.Caller.SendAsync("ReceiveStockfishMove", responseJson);
         }
     }
 }

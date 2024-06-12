@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Numerics;
+using System.Collections.Generic;
+using System.Text.Json;
+using System.Threading.Tasks;
 using ChessLibrary;
 using ChessLibrary.Engine.Movement;
 using ChessLibrary.Models.Pieces;
@@ -108,6 +110,33 @@ namespace ChessWebApp.Hubs
                     }
                 }
             }
+        }
+
+        public async Task<string> GetLegalMoves(string originSquare)
+        {
+            if (_connectionIdToGroup.TryGetValue(Context.ConnectionId, out var group))
+            {
+                if (_groupToGame.TryGetValue(group, out var game))
+                {
+                    game.SelectSquare(originSquare);
+
+                    var legalMoves = game.CurrentSquareMoves;
+                    List<string> legalMovesString = new List<string>();
+                    foreach (Move move in legalMoves)
+                    {
+                        string destinationSquare = move.ToString().Substring(2, 2);
+                        legalMovesString.Add(destinationSquare);
+                    }
+
+                    // Deselect the square and log the state
+                    game.DeselectSquare();
+                    Console.WriteLine($"CurrentSquare after deselecting: {game.CurrentSquare}");
+
+                    // Return the serialized legal moves
+                    return JsonSerializer.Serialize(legalMovesString);
+                }
+            }
+            return JsonSerializer.Serialize(new List<string>());
         }
     }
 }
