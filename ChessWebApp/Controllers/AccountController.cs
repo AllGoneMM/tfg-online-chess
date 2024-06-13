@@ -34,6 +34,8 @@ namespace ChessWebApp.Controllers
             return View();
         }
 
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> LogIn(LogInVM logInVm)
