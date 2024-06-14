@@ -310,7 +310,7 @@ function setDynamicHeight() {
     const userInfoHeight = document.querySelector('#userInfo').offsetHeight;
     const boardContainerMaxWidth = rowHeight - opponentInfoHeight - userInfoHeight;
     boardContainer.style.maxWidth = `${boardContainerMaxWidth}px`;
-    const opponentInfo = document.querySelector('#opponentInfo').style.width = boardContainerMaxWidth + "px"
+    const opponentInfo = document.querySelector('#auxDiv').style.width = boardContainerMaxWidth + "px"
 }
 window.addEventListener('load', setDynamicHeight);
 window.addEventListener('resize', setDynamicHeight);
