@@ -185,5 +185,31 @@ namespace ChessWebApp.Services
 
             return players;
         }
+
+        public (ChessGameResponse, ChessGameResponse) Promote(string connectionId, string pieceChar)
+        {
+            var response = new ChessGameResponse();
+            var opponentResponse = new ChessGameResponse();
+            if (_players.TryGetValue(connectionId, out var playerInfo))
+            {
+                if (_playerInfoToGroup.TryGetValue(playerInfo, out var group) &&
+                    _groupToGame.TryGetValue(group, out var game))
+                {
+                    game.Promote(pieceChar);
+                    response.Fen = game.ToString();
+                    response.State = game.State;
+                    response.Turn = game.Turn;
+                    response.Promotion = game.Promotion;
+                    response.LegalMoves = game.GetAllLegalMoves(playerInfo.Team);
+
+                    opponentResponse.Fen = game.ToString();
+                    opponentResponse.State = game.State;
+                    opponentResponse.Turn = game.Turn;
+                    opponentResponse.Promotion = game.Promotion;
+                    opponentResponse.LegalMoves = game.GetAllLegalMoves();
+                }
+            }
+            return (response, opponentResponse);
+        }
     }
 }

@@ -13,5 +13,6 @@ namespace ChessWebApp.Services
         Task LeaveGame(string connectionId);
         string GetGroup(string connectionId);
         List<string> GetPlayersInGroup(string group);
+        (ChessGameResponse, ChessGameResponse) Promote(string connectionId, string pieceChar);
     }
 }

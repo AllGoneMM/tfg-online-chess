@@ -190,7 +190,8 @@ namespace ChessLibrary
                     case "r": promoteType = PieceType.ROOK; break;
                     case "b": promoteType = PieceType.BISHOP; break;
                     case "n": promoteType = PieceType.KNIGHT; break;
-                    default: throw new ArgumentException();
+                    default: promoteType = PieceType.QUEEN;
+                        break;
                 }
             }
             MoveProcessor moveProcessor = new(_gameContext);

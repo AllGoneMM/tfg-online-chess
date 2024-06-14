@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Threading.Tasks;
+using ChessLibrary.Engine.Movement;
 using ChessWebApp.Models.DTOs;
 using ChessWebApp.Services;
 using Microsoft.AspNetCore.SignalR;
@@ -80,7 +81,7 @@ namespace ChessWebApp.Hubs
         public async Task<string> ProcessMove(string move)
         {
             var response = _onlineGameService.ProcessMove(Context.ConnectionId, move);
-            if (response.Item1.MoveResult != null && response.Item1.MoveResult.IsSuccessful())
+            if (response.Item1.MoveResult != null && response.Item1.MoveResult.IsSuccessful() && response.Item1.Promotion == null)
             {
                 // Retrieve the group the player belongs to
                 string group = _onlineGameService.GetGroup(Context.ConnectionId);
@@ -104,5 +105,30 @@ namespace ChessWebApp.Hubs
             return responseJson;
         }
 
+        public async Task<string> Promote(string pieceChar)
+        {
+            var response = _onlineGameService.Promote(Context.ConnectionId, pieceChar);
+
+            // Retrieve the group the player belongs to
+            string group = _onlineGameService.GetGroup(Context.ConnectionId);
+
+            if (!string.IsNullOrEmpty(group))
+            {
+                // Get the opponent's connection ID
+                var playersInGroup = _onlineGameService.GetPlayersInGroup(group);
+                var opponentConnectionId = playersInGroup.FirstOrDefault(id => id != Context.ConnectionId);
+
+                if (opponentConnectionId != null)
+                {
+                    string opponentResponseJson = JsonSerializer.Serialize(response.Item2);
+                    // Send the move to the opponent
+                    await Clients.Client(opponentConnectionId).SendAsync("ReceiveOpponentPlayerMove", opponentResponseJson);
+                }
+            }
+
+
+            string responseJson = JsonSerializer.Serialize(response.Item1);
+            return responseJson;
+        }
     }
 }

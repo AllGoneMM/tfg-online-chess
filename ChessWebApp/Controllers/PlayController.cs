@@ -9,6 +9,11 @@ namespace ChessWebApp.Controllers
         {
             return View();
         }
+        [HttpGet("/testonline")]
+        public IActionResult TestOnline()
+        {
+            return View();
+        }
         [HttpGet("/online")]
         public IActionResult Online()
         {

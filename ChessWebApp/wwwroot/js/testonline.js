@@ -60,8 +60,10 @@ const StateText = Object.freeze({
 
 // Global variables
 let game;
+var gameInfo;
 let signalRConnection;
 let playerTeam;
+var enableColor;
 var audio = new Audio('/assets/mp3/chess-move-sound.mp3');
 
 // Chessboard setup
@@ -93,13 +95,12 @@ const board = new Chessboard(document.getElementById("board"), {
 // ------------------------------------------------------
 
 
-// Start game button
-document.getElementById("startAIGame").addEventListener("click", handleGameStart);
+// ENTER QUEUE
+document.getElementById("queueUP").addEventListener("click", handleGameStart);
 async function handleGameStart() {
     try {
         await initializeSignalRConnection();
-        await startSignalRConnection();
-        await invokeStartGame();
+        await enterQueue();
     }
     catch (error) {
         window.alert(error);
@@ -110,67 +111,70 @@ async function handleGameStart() {
 async function initializeSignalRConnection() {
     if (!signalRConnection) {
         signalRConnection = new signalR.HubConnectionBuilder()
-            .withUrl("/hubs/offlinegame", signalR.HttpTransportType.WebSockets)
+            .withUrl("/hubs/onlinegame", signalR.HttpTransportType.WebSockets)
             .withAutomaticReconnect()
             .build();
 
-        signalRConnection.on("ReceiveStockfishMove", handleStockfishMove);
     }
+    signalRConnection
+        .on("ReceiveGameInfo",
+            (response, gameInfo) => {
+
+                // TODO: Implement opponent info loading
+
+                game = JSON.parse(response);
+                gameInfo = JSON.parse(gameInfo);
+                playerTeam = PieceTeamText[gameInfo.PlayerInformation.Team];
+                enableColor = playerTeam === 'white' ? COLOR.white : COLOR.black;
+
+                board.setPosition(game.Fen, true);
+                board.setOrientation(enableColor, true);
+                board.disableMoveInput();
+
+                if (game.Turn === PieceTeamInt[playerTeam]) {
+                    if (game.LegalMoves) {
+                        game.LegalMoves = transformLegalMovesToDictionary(game.LegalMoves);
+                        board.enableMoveInput(inputHandler, enableColor);
+                        console.log(game.LegalMoves);
+                    }
+                }
+            });
+    signalRConnection.on("ReceiveOpponentPlayerMove",
+        (response) => {
+            handleOpponentPlayerMove(response);
+        });
 }
 
-async function startSignalRConnection() {
+
+async function enterQueue() {
+    // Enter the queue
     if (signalRConnection.state !== signalR.HubConnectionState.Connected) {
-        await signalRConnection.start();
+        await signalRConnection.start()
+            .then(() => {
+                window.alert("Queue entered");
+            })
+            .catch((error) => {
+                window.alert(error);
+            });
     }
 }
 
-async function invokeStartGame() {
-    board.setPosition(FEN.start, true);
-    playerTeam = document.getElementById('black').checked ? 'black' : 'white';
-    if (playerTeam === 'black') {
-        board.setOrientation(COLOR.black, true);
-    } else {
-        board.setOrientation(COLOR.white, true);
-    }
-    board.disableMoveInput();
-    let enableColor = playerTeam === 'white' ? COLOR.white : COLOR.black;
-    try {
-        const response = await signalRConnection.invoke("StartGame", playerTeam);
-        game = JSON.parse(response);
-        game.LegalMoves = transformLegalMovesToDictionary(game.LegalMoves);
-        board.disableMoveInput();
-        board.setPosition(game.Fen, true);
-        if (playerTeam === "black") {
-            audio.play();
-        }
-
-        if (game.Turn === PieceTeamInt[playerTeam]) {
-            board.enableMoveInput(inputHandler, enableColor);
-        }
-    } catch (error) {
-        console.error("Error starting game:", error);
-        window.alert("Error al iniciar la partida: " + error.toString());
-    }
-}
-
-function handleStockfishMove(response) {
+function handleOpponentPlayerMove(response) {
     game = JSON.parse(response);
-    board.setPosition(game.Fen, true);
-    audio.play();
-
-    if (game.State === State.IN_PROGRESS) {
-        if (game.LegalMoves) {
-            game.LegalMoves = transformLegalMovesToDictionary(game.LegalMoves);
-            let enableColor = playerTeam === 'white' ? COLOR.white : COLOR.black;
-            board.enableMoveInput(inputHandler, enableColor);
-        }
-    } else {
-        //TODO: Open modal
+    if (game.LegalMoves) {
+        game.LegalMoves = transformLegalMovesToDictionary(game.LegalMoves);
     }
+    board.setPosition(game.Fen, true);
+    if (game.State !== State.IN_PROGRESS) {
+        window.alerte("Game over");
+    } else {
+        board.enableMoveInput(inputHandler, enableColor);
+    }
+    
 }
 
 
-// Input handler
+// INPUT HANDLER
 async function inputHandler(event) {
     console.log("inputHandler", event);
 
@@ -247,21 +251,35 @@ async function handleValidateMoveInput(event) {
 }
 
 // Move finished
-function handleMoveInputFinished(event) {
+ function handleMoveInputFinished(event) {
     if (event.legalMove) {
+        event.chessboard.setPosition(game.Fen);
         audio.play();
-        board.setPosition(game.Fen);
-        event.chessboard.disableMoveInput();
+        
         if (game.Promotion) {
-            //TODO: Show promotion dialog, if canceled automatically promote to queen
+            event.chessboard.showPromotionDialog(event.squareTo, enableColor, (result) => {
+                console.log("Promotion result", result)
+                if (result && result.piece) {
+                    signalRConnection.invoke("Promote", result.piece.charAt(1)).then((response => {
+                        game = JSON.parse(response)
+                        event.chessboard.setPosition(game.Fen);
+                        event.chessboard.disableMoveInput();
+                    }));
+             
+                } else {
+                    signalRConnection.invoke("Promote", "q").then((response => {
+                        game = JSON.parse(response)
+                        event.chessboard.setPosition(game.Fen);
+                        event.chessboard.disableMoveInput();
+                    }));
+                }
+            })
         }
         else if (game.State !== State.IN_PROGRESS) {
             //TODO: Open modal
         } else {
-            signalRConnection.invoke("GetStockfishMove")
-                .catch((error) => {
-                    console.error("Error processing move:", error);
-                });
+            event.chessboard.disableMoveInput();
+
         }
     }
     event.chessboard.removeMarkers(MARKER_TYPE.dot);

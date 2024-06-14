@@ -89,6 +89,9 @@ html {
         height: 100%;
     }
 }
+#board {
+    box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.8);
+}
 
 .navbar {
     box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1) !important;
