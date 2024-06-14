@@ -4,16 +4,6 @@ namespace ChessWebApp.Controllers
 {
     public class PlayController : Controller
     {
-        [HttpGet("/test")]
-        public IActionResult Test()
-        {
-            return View();
-        }
-        [HttpGet("/testonline")]
-        public IActionResult TestOnline()
-        {
-            return View();
-        }
         [HttpGet("/online")]
         public IActionResult Online()
         {

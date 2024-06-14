@@ -7,6 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\js\src\**" />
+    <Compile Remove="wwwroot\lib\chessboardjs\**" />
+    <Content Remove="wwwroot\js\src\**" />
+    <Content Remove="wwwroot\lib\chessboardjs\**" />
+    <EmbeddedResource Remove="wwwroot\js\src\**" />
+    <EmbeddedResource Remove="wwwroot\lib\chessboardjs\**" />
+    <None Remove="wwwroot\js\src\**" />
+    <None Remove="wwwroot\lib\chessboardjs\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="wwwroot\js\login.js" />
     <Content Remove="wwwroot\js\root.js" />
   </ItemGroup>
@@ -29,72 +40,15 @@
 
   <ItemGroup>
     <Folder Include="Data\Migrations\" />
-    <Folder Include="wwwroot\js\cm-chessboard-master\assets\extensions\arrows\" />
-    <Folder Include="wwwroot\js\cm-chessboard-master\assets\extensions\markers\" />
-    <Folder Include="wwwroot\js\cm-chessboard-master\assets\extensions\promotion-dialog\" />
-    <Folder Include="wwwroot\js\cm-chessboard-master\assets\pieces\" />
-    <Folder Include="wwwroot\js\cm-chessboard-master\examples\extensions\" />
-    <Folder Include="wwwroot\js\cm-chessboard-master\examples\styles\" />
-    <Folder Include="wwwroot\js\cm-chessboard-master\src\extensions\accessibility\" />
-    <Folder Include="wwwroot\js\cm-chessboard-master\src\extensions\arrows\" />
-    <Folder Include="wwwroot\js\cm-chessboard-master\src\extensions\auto-border-none\" />
-    <Folder Include="wwwroot\js\cm-chessboard-master\src\extensions\html-layer\" />
-    <Folder Include="wwwroot\js\cm-chessboard-master\src\extensions\markers\" />
-    <Folder Include="wwwroot\js\cm-chessboard-master\src\extensions\persistence\" />
-    <Folder Include="wwwroot\js\cm-chessboard-master\src\extensions\promotion-dialog\" />
-    <Folder Include="wwwroot\js\cm-chessboard-master\src\lib\" />
-    <Folder Include="wwwroot\js\cm-chessboard-master\src\model\" />
-    <Folder Include="wwwroot\js\cm-chessboard-master\src\view\" />
-    <Folder Include="wwwroot\js\cm-chessboard-master\test\mocks\" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\js\src\chess\chessboard.css.map" />
-    <None Include="wwwroot\js\src\chess\chessboard.scss" />
-    <None Include="wwwroot\js\src\chess\extensions\arrows\arrows.css.map" />
-    <None Include="wwwroot\js\src\chess\extensions\arrows\arrows.scss" />
-    <None Include="wwwroot\js\src\chess\extensions\arrows\arrows.svg" />
-    <None Include="wwwroot\js\src\chess\extensions\markers\markers.css.map" />
-    <None Include="wwwroot\js\src\chess\extensions\markers\markers.scss" />
-    <None Include="wwwroot\js\src\chess\extensions\markers\markers.svg" />
-    <None Include="wwwroot\js\src\chess\extensions\promotion-dialog\promotion-dialog.css.map" />
-    <None Include="wwwroot\js\src\chess\extensions\promotion-dialog\promotion-dialog.scss" />
-    <None Include="wwwroot\js\src\chess\pieces\standard.svg" />
-    <None Include="wwwroot\js\src\chess\pieces\staunty.svg" />
-    <None Include="wwwroot\js\src\chess\_chessboard-theme.scss" />
     <None Include="wwwroot\js\login.js" />
     <None Include="wwwroot\js\root.js" />
-    <None Include="wwwroot\js\src\Chessboard.js" />
-    <None Include="wwwroot\js\src\extensions\accessibility\Accessibility.js" />
-    <None Include="wwwroot\js\src\extensions\accessibility\I18n.js" />
-    <None Include="wwwroot\js\src\extensions\arrows\Arrows.js" />
-    <None Include="wwwroot\js\src\extensions\auto-border-none\AutoBorderNone.js" />
-    <None Include="wwwroot\js\src\extensions\html-layer\HtmlLayer.js" />
-    <None Include="wwwroot\js\src\extensions\markers\Markers.js" />
-    <None Include="wwwroot\js\src\extensions\markers\README.md" />
-    <None Include="wwwroot\js\src\extensions\persistence\Persistence.js" />
-    <None Include="wwwroot\js\src\extensions\promotion-dialog\PromotionDialog.js" />
-    <None Include="wwwroot\js\src\lib\Svg.js" />
-    <None Include="wwwroot\js\src\lib\Utils.js" />
-    <None Include="wwwroot\js\src\model\ChessboardState.js" />
-    <None Include="wwwroot\js\src\model\Extension.js" />
-    <None Include="wwwroot\js\src\model\Position.js" />
-    <None Include="wwwroot\js\src\view\ChessboardView.js" />
-    <None Include="wwwroot\js\src\view\PositionAnimationsQueue.js" />
-    <None Include="wwwroot\js\src\view\VisualMoveInput.js" />
-    <None Include="wwwroot\lib\chessboardjs\js\chessboard-1.0.0.js" />
-    <None Include="wwwroot\lib\chessboardjs\js\chessboard-1.0.0.min.js" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ChessLibrary\ChessLibrary.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Update="wwwroot\js\src\Chessboard.js">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
   </ItemGroup>
 
 </Project>

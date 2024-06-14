@@ -2,60 +2,58 @@
 @{
     ViewData["Title"] = Localizer["Play offline"];
 }
-<div id="mainContainer" class="row ps-lg-4">
-    <div class="col-12 col-lg-9 col-xl-8 pt-3 pb-3 shadow-lg rounded" id="chessBoardPlayersContainer">
-        <div class="mx-auto d-flex pb-3 gap-2 align-items-center" id="div1">
-            <div class="rounded rounded bg-danger border border-1 border-dark" style="width:25px; height:25px;"></div>
-            <span class="fw-semibold fs-6">Opponent</span>
-        </div>
-
-        <div class="mx-auto shadow-lg" id="chessBoard"></div>
-
-        <div class="mx-auto d-flex pt-3 gap-2 align-items-center" id="div2">
-            <div class="rounded rounded bg-success border border-1 border-dark" style="width:25px; height:25px;"></div>
-            <span class="fw-semibold fs-6" asp-authenticated="true">@User.Identity.Name</span>
-            <span class="fw-semibold fs-6" asp-authenticated="false">Guest</span>
-        </div>
-    </div>
-    <div class="col-12 col-lg-3 col-xl-4 p-4" style="background-color:#efefef">
-        <div class="d-flex h-100 flex-column p-4 shadow-lg rounded" style="background-color:#e6ebea;">
-            <div class="d-block h-100">
-
-            </div>
-            <button id="startGame" class="btn btn-success fs-4 fw-bolder align-self-end w-100">Start game</button>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="gameInfo" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="gameInfoTitle"></h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div id="gameInfoBody" class="modal-body">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary">Dismiss</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-@section Stylesheets {
-    <link rel="stylesheet"
-          href="https://unpkg.com/@@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css"
-          integrity="sha384-q94+BZtLrkL1/ohfjR8c6L+A6qzNH9R2hBLwyoAfu3i/WCvQjzL2RQJ3uNHDISdU"
-          crossorigin="anonymous">
+@section Stylesheets
+{
+    <link rel="stylesheet" href="~/css/chessboard.css" />
+    <link rel="stylesheet" href="~/lib/cm-chessboard-master/assets/extensions/markers/markers.css" />
+    <link rel="stylesheet" href="~/lib/cm-chessboard-master/assets/extensions/promotion-dialog/promotion-dialog.css" />
 }
-@section Scripts {
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
-            integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2"
-            crossorigin="anonymous"></script>
-    <script src="~/js/chessboard-1.0.0.js"></script>
-    <script src="~/js/offline.js"></script>
-    <script src="~/js/boardresize.js"></script>
+<div class="row justify-content-center" style="background-color:#302e2b">
+    <div id="colBoardContainer" class="col-auto ps-4 pe-4 pe-lg-0 align-items-center d-flex">
+        <div id="boardContainer" class="mx-auto w-100">
+            <div id="auxDiv"></div>
+            <!--OPPONENT CONTAINER-->
+            <div id="opponentInfo" class="pt-2 pb-2">
+                <div class="p-2 fw-semibold d-flex gap-2 align-items-center rounded" style="background-color:#525c66">
+                    <div class="rounded rounded bg-danger border border-white border-2" style="width:35px; height:35px;"></div>
+                    <span class="text-white">OPPONENT INFO</span>
+                </div>
+
+            </div>
+
+            <!--BOARD CONTAINER-->
+            <div id="board" class="shadow-lg"></div>
+
+            <!--USER CONTAINER-->
+            <div id="userInfo" class="pt-2 pb-2">
+                <div class="p-2 fw-semibold d-flex gap-2 align-items-center rounded" style="background-color:#525c66">
+                    <div class="rounded rounded bg-info border border-white border-2" style="width:35px; height:35px;"></div>
+                    <span class="text-white">USER INFO</span>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    <div class="col-sm-12 col-lg-3" style="background-color:#302e2b">
+        <div id="boardSideBar" class="p-2">
+            <div class="d-flex flex-column h-100 rounded p-4" style="background-color:#45423e">
+                <div id="playerPieceTeamConfig" class="d-flex gap-2 h-100">
+                    <input type="radio" class="btn-check" name="colorOptions" id="white" autocomplete="off" checked>
+                    <label class="btn btn-light w-100 mb-auto" for="white">WHITE</label>
+
+                    <input type="radio" class="btn-check" name="colorOptions" id="black" autocomplete="off">
+                    <label class="btn btn-dark w-100 mb-auto" for="black">BLACK</label>
+                </div>
+
+                <button id="startAIGame" class="btn btn-lg btn-success w-100 align-self-end">START GAME</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script type="module" src="https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/Chessboard.js"></script>
+    <script type="module" src="~/js/offline.js"></script>
 }
