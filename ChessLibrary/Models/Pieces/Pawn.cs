@@ -54,7 +54,8 @@ namespace ChessLibrary.Models.Pieces
 
                 if (enPassant.SquareIndex == targetIndex)
                 {
-                    return true;
+                    int enPassantOrigin = enPassant.SquareIndex;
+                    return Math.Abs(originIndex - enPassantOrigin) == 1;
                 }
                 return false;
             };
