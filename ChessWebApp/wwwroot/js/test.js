@@ -73,7 +73,7 @@ const board = new Chessboard(document.getElementById("board"), {
         cssClass: "green", // set the css theme of the board, try "green", "blue" or "chess-club"
         showCoordinates: true, // show ranks and files
         borderType:
-            BORDER_TYPE.thin, // "thin" thin border, "frame" wide border with coordinates in it, "none" no border
+            BORDER_TYPE.frame, // "thin" thin border, "frame" wide border with coordinates in it, "none" no border
         aspectRatio: 1, // height/width of the board
         pieces: {
             file: "./pieces/staunty.svg", // the filename of the sprite in `assets/pieces/` or an absolute url like `https://…` or `/…`
@@ -308,6 +308,7 @@ function setDynamicHeight() {
     const userInfoHeight = document.querySelector('#userInfo').offsetHeight;
     const boardContainerMaxWidth = rowHeight - opponentInfoHeight - userInfoHeight;
     boardContainer.style.maxWidth = `${boardContainerMaxWidth}px`;
+    const opponentInfo = document.querySelector('#opponentInfo').style.width = boardContainerMaxWidth + "px"
 }
 window.addEventListener('load', setDynamicHeight);
 window.addEventListener('resize', setDynamicHeight);
