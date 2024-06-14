@@ -77,3 +77,19 @@ html {
 }
 
 
+@media (min-width: 768px) and (max-width: 1024px) {
+    /* Your styles for medium screens go here */
+    #boardSideBar {
+        height:fit-content;
+     
+    }
+}
+@media (min-width: 992px) {
+    #boardSideBar {
+        height: 100%;
+    }
+}
+
+.navbar {
+    box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1) !important;
+}

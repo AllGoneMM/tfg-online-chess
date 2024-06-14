@@ -1,8 +1,51 @@
 ﻿@section Stylesheets
 {
     <link rel="stylesheet" href="~/css/chessboard.css" />
+    <link rel="stylesheet" href="~/js/cm-chessboard-master/assets/extensions/markers/markers.css" />
 }
-<div id="board"></div>
+<div class="row" style="background-color:#302e2b">
+    <div id="colBoardContainer" class="col-12 col-lg-8 ps-4 pe-4 pe-lg-1 align-items-center d-flex">
+        <div id="boardContainer" class="mx-auto w-100">
+            <!--OPPONENT CONTAINER-->
+            <div id="opponentInfo" class="pt-2 pb-2">
+                <div class="p-2 fw-semibold d-flex gap-2 align-items-center rounded" style="background-color:#525c66">
+                    <div class="rounded rounded bg-danger border border-white border-2" style="width:35px; height:35px;"></div>
+                    <span class="text-white">OPPONENT INFO</span>
+                </div>
+
+            </div>
+
+            <!--BOARD CONTAINER-->
+            <div id="board" class="shadow-lg"></div>
+
+            <!--USER CONTAINER-->
+            <div id="userInfo" class="pt-2 pb-2">
+                <div class="p-2 fw-semibold d-flex gap-2 align-items-center rounded" style="background-color:#525c66">
+                    <div class="rounded rounded bg-info border border-white border-2" style="width:35px; height:35px;"></div>
+                    <span class="text-white">USER INFO</span>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    <div class="col-sm-12 col-lg-4 ps-lg-0" style="background-color:#302e2b">
+        <div id="boardSideBar" class="p-2 ps-lg-0">
+            <div class="d-flex flex-column h-100 rounded p-4" style="background-color:#45423e">
+                <div id="playerPieceTeamConfig" class="d-flex gap-2 h-100">
+                    <input type="radio" class="btn-check" name="colorOptions" id="white" autocomplete="off" checked>
+                    <label class="btn btn-light w-100 mb-auto" for="white">WHITE</label>
+
+                    <input type="radio" class="btn-check" name="colorOptions" id="black" autocomplete="off">
+                    <label class="btn btn-dark w-100 mb-auto" for="black">BLACK</label>
+                </div>
+
+                <button id="startAIGame" class="btn btn-lg btn-success w-100 align-self-end">START GAME</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts
 {
     <script type="module" src="https://cdn.jsdelivr.net/npm/cm-chessboard@8/src/Chessboard.js"></script>

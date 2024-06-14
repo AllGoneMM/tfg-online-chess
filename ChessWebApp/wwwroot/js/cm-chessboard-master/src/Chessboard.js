@@ -124,7 +124,9 @@ export class Chessboard {
     }
 
     enableMoveInput(eventHandler, color = undefined) {
-        this.view.enableMoveInput(eventHandler, color)
+        this.view.enableMoveInput(async (event) => {
+            return await eventHandler(event);
+        }, color);
     }
 
     disableMoveInput() {

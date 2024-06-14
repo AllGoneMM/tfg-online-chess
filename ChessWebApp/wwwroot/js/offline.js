@@ -83,53 +83,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 });
 function openModal() {
     document.getElementById('gameInfoTitle').innerText = "Game Over";
-    document.getElementById('<div id="mainContainer" class="row ps-lg-4">
-    <div class="col-12 col-lg-9 col-xl-8 pt-3 pb-3 shadow-lg rounded" id="chessBoardPlayersContainer">
-        <div class="mx-auto d-flex pb-3 gap-2 align-items-center" id="div1">
-            <div class="rounded rounded bg-danger border border-1 border-dark" style="width:25px; height:25px;"></div>
-            <span class="fw-semibold fs-6">Opponent</span>
-        </div>
-
-        <div class="mx-auto shadow-lg" id="chessBoard"></div>
-
-        <div class="mx-auto d-flex pt-3 gap-2 align-items-center" id="div2">
-            <div class="rounded rounded bg-success border border-1 border-dark" style="width:25px; height:25px;"></div>
-            <span class="fw-semibold fs-6" asp-authenticated="true">@User.Identity.Name</span>
-            <span class="fw-semibold fs-6" asp-authenticated="false">Guest</span>
-        </div>
-    </div>
-    <div class="col-12 col-lg-3 col-xl-4 p-4" style="background-color:#efefef">
-        <div class="d-flex h-100 flex-column p-4 shadow-lg rounded" style="background-color:#e6ebea;">
-            <div class="d-block h-100">
-
-            </div>
-            <button id="startGame" class="btn btn-success fs-4 fw-bolder align-self-end w-100">Start game</button>
-        </div>
-    </div>
-</div > <div id="mainContainer" class="row ps-lg-4">
-            <div class="col-12 col-lg-9 col-xl-8 pt-3 pb-3 shadow-lg rounded" id="chessBoardPlayersContainer">
-                <div class="mx-auto d-flex pb-3 gap-2 align-items-center" id="div1">
-                    <div class="rounded rounded bg-danger border border-1 border-dark" style="width:25px; height:25px;"></div>
-                    <span class="fw-semibold fs-6">Opponent</span>
-                </div>
-
-                <div class="mx-auto shadow-lg" id="chessBoard"></div>
-
-                <div class="mx-auto d-flex pt-3 gap-2 align-items-center" id="div2">
-                    <div class="rounded rounded bg-success border border-1 border-dark" style="width:25px; height:25px;"></div>
-                    <span class="fw-semibold fs-6" asp-authenticated="true">@User.Identity.Name</span>
-                    <span class="fw-semibold fs-6" asp-authenticated="false">Guest</span>
-                </div>
-            </div>
-            <div class="col-12 col-lg-3 col-xl-4 p-4" style="background-color:#efefef">
-                <div class="d-flex h-100 flex-column p-4 shadow-lg rounded" style="background-color:#e6ebea;">
-                    <div class="d-block h-100">
-
-                    </div>
-                    <button id="startGame" class="btn btn-success fs-4 fw-bolder align-self-end w-100">Start game</button>
-                </div>
-            </div>
-        </div>gameInfoBody').innerText = StateText[chessGame.State];
+    document.getElementById('gameInfoBody').innerText = StateText[chessGame.State];
     const gameInfo = new bootstrap.Modal(document.getElementById('gameInfo'));
     gameInfo.show();
 }

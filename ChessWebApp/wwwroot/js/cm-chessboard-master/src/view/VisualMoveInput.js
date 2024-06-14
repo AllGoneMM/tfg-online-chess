@@ -58,10 +58,10 @@ export class VisualMoveInput {
         this.view.movingOverSquareCallback(fromSquare, toSquare)
     }
 
-    validateMoveInputCallback(fromSquare, toSquare) {
-        const result = this.view.validateMoveInputCallback(fromSquare, toSquare)
-        this.chessboard.state.moveInputProcess.resolve(result)
-        return result
+    async validateMoveInputCallback(fromSquare, toSquare) {
+        const result = await this.view.validateMoveInputCallback(fromSquare, toSquare);
+        this.chessboard.state.moveInputProcess.resolve(result);
+        return result;
     }
 
     moveInputCanceledCallback(fromSquare, toSquare, reason) {
@@ -69,7 +69,7 @@ export class VisualMoveInput {
         this.chessboard.state.moveInputProcess.resolve()
     }
 
-    setMoveInputState(newState, params = undefined) {
+    async setMoveInputState(newState, params = undefined) {
         const prevState = this.moveInputState
         this.moveInputState = newState
 
@@ -160,21 +160,21 @@ export class VisualMoveInput {
 
             case MOVE_INPUT_STATE.moveDone:
                 if ([MOVE_INPUT_STATE.dragTo, MOVE_INPUT_STATE.clickTo, MOVE_INPUT_STATE.clickDragTo].indexOf(prevState) === -1) {
-                    throw new Error("moveInputState")
+                    throw new Error("moveInputState");
                 }
-                this.toSquare = params.square
-                if (this.toSquare && this.validateMoveInputCallback(this.fromSquare, this.toSquare)) {
+                this.toSquare = params.square;
+                if (this.toSquare && await this.validateMoveInputCallback(this.fromSquare, this.toSquare)) {
                     this.chessboard.movePiece(this.fromSquare, this.toSquare, prevState === MOVE_INPUT_STATE.clickTo).then(() => {
                         if (prevState === MOVE_INPUT_STATE.clickTo) {
-                            this.view.setPieceVisibility(this.toSquare, true)
+                            this.view.setPieceVisibility(this.toSquare, true);
                         }
-                        this.setMoveInputState(MOVE_INPUT_STATE.reset)
-                    })
+                        this.setMoveInputState(MOVE_INPUT_STATE.reset);
+                    });
                 } else {
-                    this.view.setPieceVisibility(this.fromSquare, true)
-                    this.setMoveInputState(MOVE_INPUT_STATE.reset)
+                    this.view.setPieceVisibility(this.fromSquare, true);
+                    this.setMoveInputState(MOVE_INPUT_STATE.reset);
                 }
-                break
+                break;
 
             case MOVE_INPUT_STATE.reset:
                 if (this.fromSquare && !this.toSquare && this.movedPiece) {
