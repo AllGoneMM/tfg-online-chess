@@ -15,8 +15,10 @@
             <!--OPPONENT CONTAINER-->
             <div id="opponentInfo" class="pt-2 pb-2">
                 <div class="p-2 fw-semibold d-flex gap-2 align-items-center rounded" style="background-color:#525c66">
-                    <div class="rounded rounded bg-danger border border-white border-2" style="width:35px; height:35px;"></div>
-                    <span class="text-white">OPPONENT INFO</span>
+                    <div class="rounded rounded bg-success border border-white border-2" style="width:35px; height:35px;">
+                        <img src="~/assets/img/stockfish.svg" class="img-fluid"/>
+                    </div>
+                    <span class="text-white">STOCKFISH ENGINE</span>
                 </div>
 
             </div>
@@ -27,8 +29,12 @@
             <!--USER CONTAINER-->
             <div id="userInfo" class="pt-2 pb-2">
                 <div class="p-2 fw-semibold d-flex gap-2 align-items-center rounded" style="background-color:#525c66">
-                    <div class="rounded rounded bg-info border border-white border-2" style="width:35px; height:35px;"></div>
-                    <span class="text-white">USER INFO</span>
+                    <div class="rounded rounded bg-info border border-white border-2" style="width:35px; height:35px;">
+                        <img src="~/assets/img/user.png" class="img-fluid" />
+                    </div>
+                    <span asp-authenticated="false" class="text-white">GUEST</span>
+                    <span asp-authenticated="true" class="text-white">@Context.User?.Identity?.Name</span>
+
                 </div>
 
             </div>
@@ -46,7 +52,23 @@
                     <label class="btn btn-dark w-100 mb-auto" for="black">BLACK</label>
                 </div>
 
-                <button id="startAIGame" class="btn btn-lg btn-success w-100 align-self-end">START GAME</button>
+                <button id="startAIGame" class="btn btn-lg btn-success w-100 align-self-end fw-bolder rounded-pill">START GAME</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="endGameModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered text-white">
+        <div class="modal-content border border-2 border-success bg-dark">
+            <div class="modal-header border-0">
+                <h1 class="modal-title fs-2" id="endGameTitle"></h1>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div id="endGameBody" class="modal-body fs-4 border-success">
+            </div>
+            <div class="modal-footer d-flex justify-content-center border-success border-2">
+                <button type="button" class="btn btn-success rounded-pill">Rematch</button>
+                <button type="button" class="btn btn-primary rounded-pill" data-bs-dismiss="modal">New game</button>
             </div>
         </div>
     </div>

@@ -166,11 +166,11 @@ function handleOpponentPlayerMove(response) {
     }
     board.setPosition(game.Fen, true);
     if (game.State !== State.IN_PROGRESS) {
-        window.alerte("Game over");
+        openModal()
     } else {
         board.enableMoveInput(inputHandler, enableColor);
     }
-    
+
 }
 
 
@@ -194,7 +194,7 @@ async function inputHandler(event) {
             break;
         default:
             event.chessboard.removeMarkers(MARKER_TYPE.dot);
-            event.chessboard.removeMarkers(MARKER_TYPE.bevel);
+            event.chessboard.removeMarkers(MARKER_TYPE.frameDanger);
             break;
     }
 }
@@ -206,7 +206,7 @@ function handleMoveInputStarted(event) {
         if (sourceLegalMoves) {
             sourceLegalMoves.forEach((move) => {
                 if (event.chessboard.getPiece(move)) {
-                    event.chessboard.addMarker(MARKER_TYPE.bevel, move);
+                    event.chessboard.addMarker(MARKER_TYPE.frameDanger, move);
                 } else {
                     event.chessboard.addMarker(MARKER_TYPE.dot, move);
                 }
@@ -251,11 +251,11 @@ async function handleValidateMoveInput(event) {
 }
 
 // Move finished
- function handleMoveInputFinished(event) {
+function handleMoveInputFinished(event) {
     if (event.legalMove) {
         event.chessboard.setPosition(game.Fen);
         audio.play();
-        
+
         if (game.Promotion) {
             event.chessboard.showPromotionDialog(event.squareTo, enableColor, (result) => {
                 console.log("Promotion result", result)
@@ -265,7 +265,7 @@ async function handleValidateMoveInput(event) {
                         event.chessboard.setPosition(game.Fen);
                         event.chessboard.disableMoveInput();
                     }));
-             
+
                 } else {
                     signalRConnection.invoke("Promote", "q").then((response => {
                         game = JSON.parse(response)
@@ -276,14 +276,15 @@ async function handleValidateMoveInput(event) {
             })
         }
         else if (game.State !== State.IN_PROGRESS) {
-            //TODO: Open modal
+            event.chessboard.disableMoveInput();
+            openModal();
         } else {
             event.chessboard.disableMoveInput();
 
         }
     }
     event.chessboard.removeMarkers(MARKER_TYPE.dot);
-    event.chessboard.removeMarkers(MARKER_TYPE.bevel);
+    event.chessboard.removeMarkers(MARKER_TYPE.frameDanger);
 }
 
 
@@ -311,7 +312,42 @@ function transformLegalMovesToDictionary(legalMoves) {
 
     return result;
 }
-
+function openModal() {
+    let endGameTitle = "";
+    let endGameBody = "";
+    switch (game.State) {
+        case State.WIN_WHITE:
+            endGameTitle = "White wins";
+            endGameBody = "Checkmate!";
+            break;
+        case State.WIN_BLACK:
+            endGameTitle = "Black wins";
+            endGameBody = "Checkmate!";
+            break;
+        case State.DRAW_STALEMATE:
+            endGameTitle = "Draw";
+            endGameBody = "Stalemate!";
+            break;
+        case State.DRAW_THREEFOLD_REPETITION:
+            endGameTitle = "Draw";
+            endGameBody = "Threefold repetition!";
+            break;
+        case State.DRAW_FIFTY_MOVE_RULE:
+            endGameTitle = "Draw";
+            endGameBody = "Fifty move rule!";
+            break;
+        case State.DRAW_INSUFFICIENT_MATERIAL:
+            endGameTitle = "Draw";
+            endGameBody = "Insufficient material!";
+            break;
+        default:
+            break;
+    }
+    document.getElementById('endGameTitle').innerText = endGameTitle;
+    document.getElementById('endGameBody').innerText = endGameBody;
+    const gameInfo = new bootstrap.Modal(document.getElementById('endGameModal'));
+    gameInfo.show();
+}
 
 // ------------------------------------------------------
 ///////////////// UI ADJUSTMENTS ////////////////////////

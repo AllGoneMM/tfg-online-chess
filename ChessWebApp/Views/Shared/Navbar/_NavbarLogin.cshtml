@@ -6,10 +6,10 @@
     <a asp-action="LogIn" asp-controller="Account" class="btn btn-sm btn-success">@Localizer["Log In"]</a>
 </div>
 <div asp-authenticated="true" class="dropdown">
-    <a class="btn btn-primary rounded-circle" role="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+    <a class="btn btn-success rounded" role="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
         <i class="fa-solid fa-user"></i>
     </a>
-    <ul class="dropdown-menu dropdown-menu-end" style="z-index:20;">
+    <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" style="z-index:20;">
         <li>
             <span class="dropdown-item-text fw-bold text-center w-100">@User.Identity.Name</span>
         </li>

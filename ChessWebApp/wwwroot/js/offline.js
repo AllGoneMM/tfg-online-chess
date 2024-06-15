@@ -165,7 +165,7 @@ function handleStockfishMove(response) {
             board.enableMoveInput(inputHandler, enableColor);
         }
     } else {
-        //TODO: Open modal
+        openModal();
     }
 }
 
@@ -202,7 +202,7 @@ function handleMoveInputStarted(event) {
         if (sourceLegalMoves) {
             sourceLegalMoves.forEach((move) => {
                 if (event.chessboard.getPiece(move)) {
-                    event.chessboard.addMarker(MARKER_TYPE.bevel, move);
+                    event.chessboard.addMarker(MARKER_TYPE.frameDanger, move);
                 } else {
                     event.chessboard.addMarker(MARKER_TYPE.dot, move);
                 }
@@ -256,7 +256,7 @@ function handleMoveInputFinished(event) {
             //TODO: Show promotion dialog, if canceled automatically promote to queen
         }
         else if (game.State !== State.IN_PROGRESS) {
-            //TODO: Open modal
+            openModal();
         } else {
             signalRConnection.invoke("GetStockfishMove")
                 .catch((error) => {
@@ -265,7 +265,7 @@ function handleMoveInputFinished(event) {
         }
     }
     event.chessboard.removeMarkers(MARKER_TYPE.dot);
-    event.chessboard.removeMarkers(MARKER_TYPE.bevel);
+    event.chessboard.removeMarkers(MARKER_TYPE.frameDanger);
 }
 
 
@@ -294,6 +294,43 @@ function transformLegalMovesToDictionary(legalMoves) {
     return result;
 }
 
+function openModal() {
+    let endGameTitle = "";
+    let endGameBody = "";
+    switch (game.State) {
+        case State.WIN_WHITE:
+            endGameTitle = "White wins";
+            endGameBody = "Checkmate!";
+            break;
+        case State.WIN_BLACK:
+            endGameTitle = "Black wins";
+            endGameBody = "Checkmate!";
+            break;
+        case State.DRAW_STALEMATE:
+            endGameTitle = "Draw";
+            endGameBody = "Stalemate!";
+            break;
+        case State.DRAW_THREEFOLD_REPETITION:
+            endGameTitle = "Draw";
+            endGameBody = "Threefold repetition!";
+            break;
+        case State.DRAW_FIFTY_MOVE_RULE:
+            endGameTitle = "Draw";
+            endGameBody = "Fifty move rule!";
+            break;
+        case State.DRAW_INSUFFICIENT_MATERIAL:
+            endGameTitle = "Draw";
+            endGameBody = "Insufficient material!";
+            break;
+        default:
+            break;
+    }
+    document.getElementById('endGameTitle').innerText = endGameTitle;
+    document.getElementById('endGameBody').innerText = endGameBody;
+    const gameInfo = new bootstrap.Modal(document.getElementById('endGameModal'));
+    gameInfo.show();
+}
+
 
 // ------------------------------------------------------
 ///////////////// UI ADJUSTMENTS ////////////////////////
@@ -314,3 +351,4 @@ function setDynamicHeight() {
 }
 window.addEventListener('load', setDynamicHeight);
 window.addEventListener('resize', setDynamicHeight);
+
