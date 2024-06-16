@@ -16,6 +16,7 @@ namespace ChessWebApp.Models.DTOs
         public State? State { get; set; }
         public Square? Promotion { get; set; }
         public List<Move>? LegalMoves { get; set; }
+        public List<string>? MoveHistory { get; set; }
         public string? ErrorMessage { get; set; }
     }
 }

@@ -76,7 +76,7 @@ namespace ChessLibrary
                 List<string> moveHistory = new();
                 foreach ((Move move, string fen) in _gameContext.MoveHistory)
                 {
-                    moveHistory.Add(move + " " + fen);
+                    moveHistory.Add($"{move.ToString()}");
                 }
                 return moveHistory;
             }

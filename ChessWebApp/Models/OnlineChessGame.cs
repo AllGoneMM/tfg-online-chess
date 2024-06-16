@@ -35,6 +35,7 @@ namespace ChessWebApp.Models
                 OpponentUsername = opponent.Username,
                 Username = player.Username,
                 Team = player.Team,
+                MoveHistory = Game.MoveHistory
             };
 
             return response;
@@ -74,6 +75,7 @@ namespace ChessWebApp.Models
                 OpponentUsername = opponent.Username,
                 Username = player.Username,
                 Team = player.Team,
+                MoveHistory = Game.MoveHistory
             };
 
             return response;

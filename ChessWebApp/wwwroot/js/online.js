@@ -107,14 +107,25 @@ const board = new Chessboard(document.getElementById("board"), {
 // ENTER QUEUE
 document.getElementById("queueUP").addEventListener("click", handleGameStart);
 async function handleGameStart() {
-    try {
-        await initializeSignalRConnection();
-        await enterQueue();
-    }
-    catch (error) {
-        window.alert(error);
-    }
+    if (signalRConnection && signalRConnection.state === signalR.HubConnectionState.Connected) {
+        signalRConnection.stop().then(() => {
+            document.getElementById("queueUP").classList.remove("queue-btn");
+            document.getElementById("cancelQueueIcon").classList.remove("cancel-queue-icon");
+            document.getElementById("spinner").classList.remove("spinner-border", "loading-spinner");
+        });
+    } else {
+        document.getElementById("queueUP").classList.add("queue-btn");
+        document.getElementById("cancelQueueIcon").classList.add("cancel-queue-icon");
+        document.getElementById("spinner").classList.add("spinner-border", "loading-spinner");
 
+        try {
+            await initializeSignalRConnection();
+            await enterQueue();
+        }
+        catch (error) {
+            window.alert(error);
+        }
+    }
 }
 
 async function initializeSignalRConnection() {
@@ -128,6 +139,13 @@ async function initializeSignalRConnection() {
     signalRConnection
         .on("ReceiveInitialResponse",
             (initialResponse) => {
+
+                document.getElementById("queueUP").classList.remove("queue-btn");
+                document.getElementById("cancelQueueIcon").classList.remove("cancel-queue-icon");
+                document.getElementById("spinner").classList.remove("spinner-border", "loading-spinner");
+                document.getElementById("queueUP").classList.add("hidden");
+
+
                 // TODO: Implement opponent info loading
                 game = JSON.parse(initialResponse);
                 playerTeam = PieceTeamText[game.Team];
@@ -163,7 +181,7 @@ async function enterQueue() {
     if (signalRConnection.state !== signalR.HubConnectionState.Connected) {
         await signalRConnection.start()
             .then(() => {
-                window.alert("Queue entered");
+                
             })
             .catch((error) => {
                 window.alert(error);
@@ -183,9 +201,44 @@ function handleResponse(response) {
     } else {
         board.enableMoveInput(inputHandler, enableColor);
     }
-
+    if (game.MoveHistory) {
+        drawMoveHistory(game.MoveHistory);
+    }
 }
 
+function drawMoveHistory(moveHistory) {
+    let moveHistoryTable = document.getElementById("moveHistoryTable");
+    moveHistoryTable.innerHTML = ''; // Clear previous history
+
+    moveHistory.forEach((move, index) => {
+        let row = document.createElement('tr');
+
+        // Create the "Move #" column (th)
+        let th = document.createElement('th');
+        th.textContent = index + 1;
+        th.classList.add("transparent-background");
+        row.appendChild(th);
+
+        // Extract white and black moves from the move string
+        let whiteMove = move.substring(0, 2); // First two characters
+        let blackMove = move.substring(2, 4); // Next two characters
+
+        // Create the "White" column (td)
+        let whiteMoveCell = document.createElement('td');
+        whiteMoveCell.textContent = whiteMove;
+        whiteMoveCell.classList.add("transparent-background");
+        row.appendChild(whiteMoveCell);
+
+        // Create the "Black" column (td)
+        let blackMoveCell = document.createElement('td');
+        blackMoveCell.textContent = blackMove || ''; // Handle cases where there might not be a black move
+        blackMoveCell.classList.add("transparent-background");
+        row.appendChild(blackMoveCell);
+
+        // Append the row to the table body
+        moveHistoryTable.appendChild(row);
+    });
+}
 
 // INPUT HANDLER
 async function inputHandler(event) {
@@ -268,6 +321,9 @@ function handleMoveInputFinished(event) {
     if (event.legalMove) {
         event.chessboard.setPosition(game.Fen);
         audio.play();
+        if (game.MoveHistory) {
+            drawMoveHistory(game.MoveHistory);
+        }
 
         if (game.Promotion) {
             event.chessboard.showPromotionDialog(event.squareTo, enableColor, (result) => {

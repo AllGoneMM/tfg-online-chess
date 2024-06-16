@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="~/css/chessboard.css" />
     <link rel="stylesheet" href="~/lib/cm-chessboard-master/assets/extensions/markers/markers.css" />
     <link rel="stylesheet" href="~/lib/cm-chessboard-master/assets/extensions/promotion-dialog/promotion-dialog.css" />
+    <link rel="stylesheet" href="~/css/online.css" />
 
 }
 <div class="row justify-content-center" style="background-color:#302e2b">
@@ -43,7 +44,32 @@
     <div class="col-12 col-lg-3" style="background-color:#302e2b">
         <div id="boardSideBar" class="p-2 h-100">
             <div class="d-flex flex-column h-100 rounded p-4" style="background-color:#45423e">
-                <button id="queueUP" class="btn btn-lg btn-success w-100 align-self-end rounded-pill fw-bolder">QUEUE UP</button>
+                <div class="h-100 d-flex flex-column text-white">
+                    <h3 class="fw-bold text-center display-6 border-bottom border-1" style="color:#525c66; border-color:#525c66 !important">MOVE HISTORY</h3>
+
+                    <div id="moveHistoryDiv" class="h-50 m-2">
+                        <table class="table table-dark table-responsive table-borderless" style="background-color: transparent !important">
+                            <thead>
+                            <tr>
+                                    <th scope="col" style="background-color: transparent !important">#</th>
+                                    <th scope="col" style="background-color: transparent !important">From</th>
+                                    <th scope="col" style="background-color: transparent !important">To</th>
+                            </tr>
+                            </thead>
+                            <tbody id="moveHistoryTable">
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="chatDiv" class="h-50 m-2">
+                        <h3 class="fw-bold text-center display-6 border-bottom border-1" style="color:#525c66; border-color:#525c66 !important">CHAT</h3>
+                    </div>
+                </div>
+                <button id="queueUP" class="btn btn-lg btn-success w-100 rounded-pill fw-bolder d-flex align-items-center position-relative">
+                    <div id="spinner" class="d-none text-tertiary position-absolute"></div>
+                    <span id="queue-btn-text" class="flex-grow-1">QUEUE UP</span>
+                    <i id="cancelQueueIcon" class="fa-solid fa-circle-xmark d-none position-absolute"></i>
+                </button>
             </div>
         </div>
     </div>

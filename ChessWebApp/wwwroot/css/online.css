@@ -1,0 +1,68 @@
+﻿.queue-btn {
+    background-color: #0dcaf0 !important;
+}
+    .queue-btn div {
+        display: block !important;
+    }
+    .queue-btn:hover {
+        background-color: #dc3545 !important;
+    }
+    .queue-btn:hover i {
+        display:inline !important;
+    }
+
+.cancel-queue-icon {
+    top: 30%;
+    right: 20px;
+}
+.loading-spinner {
+    top: 15%;
+    left: 20px;
+}
+
+.hidden{
+        display: none !important;
+
+}
+
+#moveHistoryDiv {
+    overflow-y: auto; /* Habilita el desplazamiento vertical */
+}
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Estiliza toda la barra de desplazamiento */
+::-webkit-scrollbar {
+    width: 12px; /* Ancho de la barra de desplazamiento vertical */
+    height: 12px; /* Altura de la barra de desplazamiento horizontal */
+}
+
+/* Estiliza la pista de la barra de desplazamiento */
+::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Color de fondo de la pista */
+    border-radius: 10px; /* Redondear los bordes */
+}
+
+/* Estiliza el thumb (la parte que se mueve) de la barra de desplazamiento */
+::-webkit-scrollbar-thumb {
+    background: #888; /* Color del thumb */
+    border-radius: 10px; /* Redondear los bordes */
+}
+
+    /* Estiliza el thumb cuando está siendo activado (por ejemplo, cuando se hace clic en él) */
+    ::-webkit-scrollbar-thumb:active {
+        background: #555; /* Color del thumb cuando se hace clic en él */
+    }
+
+    /* Opcional: Estiliza el thumb cuando el usuario está pasando el cursor por encima */
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555; /* Color del thumb cuando el usuario pasa el cursor por encima */
+    }
+
+.transparent-background{
+    background-color: transparent !important;
+}
