@@ -178,8 +178,9 @@ namespace ChessLibrary
             return new MoveResult(selectSquareResult, moveSquareResult);
         }
 
-        public void Promote(string pieceFen)
+        public bool Promote(string pieceFen)
         {
+            if (Promotion == null) return false;
             pieceFen = pieceFen.ToLower();
             PieceType promoteType = PieceType.NONE;
             foreach (Square t in Board.Layout)
@@ -197,6 +198,7 @@ namespace ChessLibrary
             }
             MoveProcessor moveProcessor = new(_gameContext);
             moveProcessor.ProcessPromotion(promoteType);
+            return true;
         }
 
         public void DeselectSquare()
@@ -224,6 +226,16 @@ namespace ChessLibrary
         {
             if (team != Turn) return new List<Move>();
             return GetAllLegalMoves();
+        }
+
+        public void AbortGame(PieceTeam team)
+        {
+            State = team == PieceTeam.WHITE ? State.WIN_BLACK_WHITE_ABORT : State.WIN_WHITE_BLACK_ABORT;
+        }
+
+        public void Surrender(PieceTeam team)
+        {
+            State = team == PieceTeam.WHITE ? State.WIN_BLACK_WHITE_RESIGN : State.WIN_WHITE_BLACK_RESIGN;
         }
 
         public override string ToString()

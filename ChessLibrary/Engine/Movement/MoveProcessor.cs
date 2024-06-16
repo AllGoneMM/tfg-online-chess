@@ -155,7 +155,7 @@ namespace ChessLibrary.Engine.Movement
                     {
                         if (board.ContainsEnemyPiece(7, turn))
                         {
-                            if (board.GetPiece(7).Type == PieceType.ROOK)
+                            if (board.GetPiece(7)?.Type == PieceType.ROOK)
                             {
                                 context.KingSideCastlingBlack = false;
                             }
@@ -169,7 +169,7 @@ namespace ChessLibrary.Engine.Movement
                     {
                         if (board.ContainsEnemyPiece(0, turn))
                         {
-                            if (board.GetPiece(0).Type == PieceType.ROOK)
+                            if (board.GetPiece(0)?.Type == PieceType.ROOK)
                             {
                                 context.QueenSideCastlingBlack = false;
                             }
@@ -185,7 +185,7 @@ namespace ChessLibrary.Engine.Movement
                     {
                         if (board.ContainsEnemyPiece(63, turn))
                         {
-                            if (board.GetPiece(63).Type == PieceType.ROOK)
+                            if (board.GetPiece(63)?.Type == PieceType.ROOK)
                             {
                                 context.KingSideCastlingWhite = false;
                             }
@@ -199,7 +199,7 @@ namespace ChessLibrary.Engine.Movement
                     {
                         if (board.ContainsEnemyPiece(56, turn))
                         {
-                            if (board.GetPiece(56).Type == PieceType.ROOK)
+                            if (board.GetPiece(56)?.Type == PieceType.ROOK)
                             {
                                 context.QueenSideCastlingWhite = false;
                             }
@@ -318,7 +318,7 @@ namespace ChessLibrary.Engine.Movement
                     int targetIndex = move.TargetIndex;
                     if (context.Board.ContainsAllyPiece(targetIndex, context.Turn))
                     {
-                        if (context.Board.GetPiece(targetIndex).Type == PieceType.KING)
+                        if (context.Board.GetPiece(targetIndex)?.Type == PieceType.KING)
                         {
                             isCheckMate = true;
                             break;
