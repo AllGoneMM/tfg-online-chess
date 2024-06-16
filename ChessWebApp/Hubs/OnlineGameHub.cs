@@ -4,51 +4,39 @@ using ChessLibrary.Engine.Movement;
 using ChessWebApp.Models.DTOs;
 using ChessWebApp.Services;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Logging;
-using System.Timers;
 using ChessWebApp.Models;
-using Timer = System.Timers.Timer;
 
 namespace ChessWebApp.Hubs
 {
     public class OnlineGameHub : Hub
     {
-        public OnlineGameHub(IOnlineGameService gameService, ILogger<OnlineGameHub> logger, IHubContext<OnlineGameHub> hubContext)
+        public OnlineGameHub(IOnlineGameService gameService, ILogger<OnlineGameHub> logger)
         {
             _gameService = gameService;
             _logger = logger;
-            _hubContext = hubContext;
         }
         private readonly IOnlineGameService _gameService;
-        private readonly IHubContext<OnlineGameHub> _hubContext;
-        private static readonly ConcurrentDictionary<string, Timer> DisconnectTimers = new ConcurrentDictionary<string, Timer>();
         private readonly ILogger<OnlineGameHub> _logger;
 
 
         public override async Task OnConnectedAsync()
         {
             // Cancelar el temporizador y enviar la información del juego al cliente
-            if (DisconnectTimers.TryRemove(Context.ConnectionId, out Timer? timer))
+            var gameRoom = _gameService.GetGameByConnectionId(Context.ConnectionId);
+            if (gameRoom != null)
             {
-                _logger.LogInformation("Client reconnected: {ConnectionId}", Context.ConnectionId);
-                timer.Stop();
-                timer.Dispose();
+                ChessPlayer? currentPlayer = gameRoom.GetPlayer(Context.ConnectionId);
 
-                var gameRoom = _gameService.GetGameByConnectionId(Context.ConnectionId);
-                if (gameRoom != null)
+                if (currentPlayer != null)
                 {
-                    ChessPlayer? currentPlayer = gameRoom.GetPlayer(Context.ConnectionId);
+                    OnlineChessResponse player1Response = gameRoom.GetResponse(currentPlayer.ConnectionId);
 
-                    if (currentPlayer != null)
-                    {
-                        OnlineChessResponse player1Response = gameRoom.GetResponse(currentPlayer.ConnectionId);
+                    string jsonPlayer1Response = JsonSerializer.Serialize(player1Response);
 
-                        string jsonPlayer1Response = JsonSerializer.Serialize(player1Response);
-
-                        await Clients.Client(currentPlayer.ConnectionId).SendAsync("ReceiveResponse", jsonPlayer1Response);
-                    }
+                    await Clients.Client(currentPlayer.ConnectionId).SendAsync("ReceiveResponse", jsonPlayer1Response);
                 }
             }
+
 
             // En caso de que no sea una reconexión, entrar en la cola
             else
@@ -88,35 +76,25 @@ namespace ChessWebApp.Hubs
 
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
-            // Si el jugador se encuentra en una partida activa, establecemos un temporizador
+            // Si el jugador se encuentra en una partida activa, damos por ganador al enemigo
             if (_gameService.GetGameByConnectionId(Context.ConnectionId) != null)
             {
                 _logger.LogInformation("Client lost connection: {ConnectionId}", Context.ConnectionId);
 
-                // Establecemos un timer de reconexión
-                string disconnectedPlayerConnectionId = Context.ConnectionId;
+                var gameRoom = _gameService.GetGameByConnectionId(Context.ConnectionId);
 
-                var gameRoom = _gameService.GetGameByConnectionId(disconnectedPlayerConnectionId);
-                string opponentConnectionId = gameRoom.GetOpponent(disconnectedPlayerConnectionId).ConnectionId;
-                Timer timer = new Timer(20000); // 20 segundos
-                timer.Elapsed += async (sender, e) =>
+                if (gameRoom != null)
                 {
-                    timer.Stop();
-                    if (gameRoom != null)
+                    ChessPlayer? disconnectedPlayer = gameRoom.GetPlayer(Context.ConnectionId);
+                    ChessPlayer? opponentPlayer = gameRoom.GetOpponent(Context.ConnectionId);
+                    if (disconnectedPlayer != null && opponentPlayer != null)
                     {
-                        ChessPlayer? disconnectedPlayer = gameRoom.GetPlayer(disconnectedPlayerConnectionId);
-                        ChessPlayer? opponentPlayer = gameRoom.GetOpponent(disconnectedPlayerConnectionId);
-
                         gameRoom.Game.AbortGame(disconnectedPlayer.Team);
                         string opponentPlayerResponseJson = JsonSerializer.Serialize(gameRoom.GetResponse(opponentPlayer.ConnectionId));
                         _gameService.RemoveGame(gameRoom.GameId);
-
-                        await _hubContext.Clients.Client(opponentPlayer.ConnectionId).SendAsync("ReceiveResponse", opponentPlayerResponseJson);
+                        await Clients.Client(opponentPlayer.ConnectionId).SendAsync("ReceiveResponse", opponentPlayerResponseJson);
                     }
-                    timer.Dispose();
-                };
-                timer.Start();
-                DisconnectTimers[Context.ConnectionId] = timer;
+                }
             }
             else
             {
@@ -184,7 +162,7 @@ namespace ChessWebApp.Hubs
             ChessPlayer? currentPlayer = gameRoom.GetPlayer(Context.ConnectionId);
             ChessPlayer? opponentPlayer = gameRoom.GetOpponent(Context.ConnectionId);
 
-            if(currentPlayer == null || opponentPlayer == null)
+            if (currentPlayer == null || opponentPlayer == null)
             {
                 return JsonSerializer.Serialize(new OnlineChessResponse
                 {

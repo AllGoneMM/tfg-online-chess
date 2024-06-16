@@ -18,7 +18,7 @@
                     <div class="rounded rounded bg-danger border border-white border-2" style="width:35px; height:35px;">
                         <img src="~/assets/img/user.png" class="img-fluid" />
                     </div>
-                    <span class="text-white">OPPONENT</span>
+                    <span id="opponentUsername" class="text-white">OPPONENT</span>
                 </div>
 
             </div>
@@ -32,7 +32,7 @@
                     <div class="rounded rounded bg-info border border-white border-2" style="width:35px; height:35px;">
                         <img src="~/assets/img/user.png" class="img-fluid" />
                     </div>
-                    <span asp-authenticated="false" class="text-white">GUEST</span>
+                    <span id="userUsername" asp-authenticated="false" class="text-white">GUEST</span>
                     <span asp-authenticated="true" class="text-white">@Context.User?.Identity?.Name</span>
                 </div>
 
@@ -40,8 +40,8 @@
 
         </div>
     </div>
-    <div class="col-sm-12 col-lg-3" style="background-color:#302e2b">
-        <div id="boardSideBar" class="p-2">
+    <div class="col-12 col-lg-3" style="background-color:#302e2b">
+        <div id="boardSideBar" class="p-2 h-100">
             <div class="d-flex flex-column h-100 rounded p-4" style="background-color:#45423e">
                 <button id="queueUP" class="btn btn-lg btn-success w-100 align-self-end rounded-pill fw-bolder">QUEUE UP</button>
             </div>

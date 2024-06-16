@@ -73,6 +73,7 @@ let signalRConnection;
 let playerTeam;
 var enableColor;
 var audio = new Audio('/assets/mp3/chess-move-sound.mp3');
+var boardStartAudio = new Audio('/assets/mp3/board-start.mp3');
 
 // Chessboard setup
 const board = new Chessboard(document.getElementById("board"), {
@@ -135,6 +136,12 @@ async function initializeSignalRConnection() {
                 board.setPosition(game.Fen, true);
                 board.setOrientation(enableColor, true);
                 board.disableMoveInput();
+                document.getElementById("opponentUsername").innerText = game.OpponentUsername;
+                let userUsername = document.getElementById("userUsername");
+                if (userUsername) {
+                    userUsername.innerText = game.Username;
+                }
+                boardStartAudio.play();
 
                 if (game.Turn === PieceTeamInt[playerTeam]) {
                     if (game.LegalMoves) {
