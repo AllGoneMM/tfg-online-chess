@@ -44,7 +44,11 @@ const State = Object.freeze({
     DRAW_STALEMATE: 4,
     DRAW_THREEFOLD_REPETITION: 5,
     DRAW_FIFTY_MOVE_RULE: 6,
-    DRAW_INSUFFICIENT_MATERIAL: 7
+    DRAW_INSUFFICIENT_MATERIAL: 7,
+    WIN_WHITE_BLACK_ABORT: 8,
+    WIN_BLACK_WHITE_ABORT: 9,
+    WIN_WHITE_BLACK_RESIGN: 10,
+    WIN_BLACK_WHITE_RESIGN:11
 });
 
 const StateText = Object.freeze({
@@ -55,7 +59,11 @@ const StateText = Object.freeze({
     4: 'DRAW_STALEMATE',
     5: 'DRAW_THREEFOLD_REPETITION',
     6: 'DRAW_FIFTY_MOVE_RULE',
-    7: 'DRAW_INSUFFICIENT_MATERIAL'
+    7: 'DRAW_INSUFFICIENT_MATERIAL',
+    8: 'WIN_WHITE_BLACK_ABORT',
+    9: 'WIN_BLACK_WHITE_ABORT',
+    10: 'WIN_WHITE_BLACK_RESIGN',
+    11: 'WIN_BLACK_WHITE_RESIGN'
 });
 
 // Global variables
@@ -117,14 +125,11 @@ async function initializeSignalRConnection() {
 
     }
     signalRConnection
-        .on("ReceiveGameInfo",
-            (response, gameInfo) => {
-
+        .on("ReceiveInitialResponse",
+            (initialResponse) => {
                 // TODO: Implement opponent info loading
-
-                game = JSON.parse(response);
-                gameInfo = JSON.parse(gameInfo);
-                playerTeam = PieceTeamText[gameInfo.PlayerInformation.Team];
+                game = JSON.parse(initialResponse);
+                playerTeam = PieceTeamText[game.Team];
                 enableColor = playerTeam === 'white' ? COLOR.white : COLOR.black;
 
                 board.setPosition(game.Fen, true);
@@ -139,9 +144,9 @@ async function initializeSignalRConnection() {
                     }
                 }
             });
-    signalRConnection.on("ReceiveOpponentPlayerMove",
+    signalRConnection.on("ReceiveResponse",
         (response) => {
-            handleOpponentPlayerMove(response);
+            handleResponse(response);
         });
 }
 
@@ -159,14 +164,15 @@ async function enterQueue() {
     }
 }
 
-function handleOpponentPlayerMove(response) {
+function handleResponse(response) {
     game = JSON.parse(response);
     if (game.LegalMoves) {
         game.LegalMoves = transformLegalMovesToDictionary(game.LegalMoves);
     }
     board.setPosition(game.Fen, true);
     if (game.State !== State.IN_PROGRESS) {
-        openModal()
+        board.disableMoveInput();
+        openModal();
     } else {
         board.enableMoveInput(inputHandler, enableColor);
     }
@@ -339,6 +345,14 @@ function openModal() {
         case State.DRAW_INSUFFICIENT_MATERIAL:
             endGameTitle = "Draw";
             endGameBody = "Insufficient material!";
+            break;
+        case State.WIN_WHITE_BLACK_ABORT:
+            endGameTitle = "White wins";
+            endGameBody = "Black aborted!";
+            break;
+        case State.WIN_BLACK_WHITE_ABORT:
+            endGameTitle = "Black wins";
+            endGameBody = "White aborted!";
             break;
         default:
             break;

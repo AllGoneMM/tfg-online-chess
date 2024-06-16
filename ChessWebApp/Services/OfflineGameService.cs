@@ -11,14 +11,14 @@ namespace ChessWebApp.Services
     public class OfflineGameService : IOfflineGameService
     {
         private readonly ConcurrentDictionary<string, ChessGame> _games;
-        private readonly ConcurrentDictionary<string, PlayerInfo> _players;
+        private readonly ConcurrentDictionary<string, ChessPlayer> _players;
         private readonly ILogger<OfflineGameService> _logger;
         private readonly string _stockfishPath;
 
         public OfflineGameService(ILogger<OfflineGameService> logger, IConfiguration configuration)
         {
             _games = new ConcurrentDictionary<string, ChessGame>();
-            _players = new ConcurrentDictionary<string, PlayerInfo>();
+            _players = new ConcurrentDictionary<string, ChessPlayer>();
             _logger = logger;
             _stockfishPath = configuration["StockfishPath"];
         }
@@ -46,7 +46,7 @@ namespace ChessWebApp.Services
             }
         }
 
-        public ChessGameResponse StartGame(PlayerInfo playerInfo)
+        public ChessGameResponse StartGame(ChessPlayer playerInfo)
         {
             _players.AddOrUpdate(playerInfo.ConnectionId, playerInfo, (_, _) => playerInfo);
             TryRemoveGame(playerInfo.ConnectionId);
@@ -75,7 +75,7 @@ namespace ChessWebApp.Services
             _logger.LogInformation("Processing move {Move} for connection {ConnectionId}", move, connectionId);
             ChessGameResponse response = new ChessGameResponse();
             ChessGame game;
-            PlayerInfo playerInfo;
+            ChessPlayer playerInfo;
 
             try
             {
@@ -129,7 +129,7 @@ namespace ChessWebApp.Services
             _logger.LogInformation("Getting Stockfish move for connection {ConnectionId}", connectionId);
             ChessGameResponse response = new ChessGameResponse();
             ChessGame game;
-            PlayerInfo playerInfo;
+            ChessPlayer playerInfo;
 
             try
             {

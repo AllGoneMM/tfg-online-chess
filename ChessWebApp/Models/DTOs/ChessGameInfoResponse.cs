@@ -4,7 +4,7 @@ namespace ChessWebApp.Models.DTOs
 {
     public class ChessGameInfoResponse
     {
-        public PlayerInfo OpponentInformation { get; set; }
-        public PlayerInfo PlayerInformation { get; set; }
+        public ChessPlayer OpponentInformation { get; set; }
+        public ChessPlayer PlayerInformation { get; set; }
     }
 }

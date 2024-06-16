@@ -7,7 +7,7 @@ namespace ChessWebApp.Services
     {
         void TryRemoveGame(string connectionId);
         void TryRemovePlayer(string connectionId);
-        ChessGameResponse StartGame(PlayerInfo playerInfo);
+        ChessGameResponse StartGame(ChessPlayer playerInfo);
         ChessGameResponse ProcessMove(string connectionId, string move);
         ChessGameResponse GetStockfishMove(string connectionId);
     }

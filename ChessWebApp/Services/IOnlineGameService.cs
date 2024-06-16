@@ -1,18 +1,15 @@
 ﻿using ChessLibrary;
+using ChessWebApp.Models;
 using ChessWebApp.Models.DTOs;
 
 namespace ChessWebApp.Services
 {
     public interface IOnlineGameService
     {
-        (ChessGameResponse, ChessGameResponse) ProcessMove(string connectionId, string move);
-        public void TryRemoveGame(PlayerInfo playerInfo);
-        public void TryRemovePlayer(PlayerInfo playerInfo);
-        Task<Dictionary<string, (ChessGameResponse, ChessGameInfoResponse)>> JoinQueue(PlayerInfo playerInfo);
-        Task LeaveQueue(string connectionId);
-        Task LeaveGame(string connectionId);
-        string GetGroup(string connectionId);
-        List<string> GetPlayersInGroup(string group);
-        (ChessGameResponse, ChessGameResponse) Promote(string connectionId, string pieceChar);
+        OnlineChessGame? JoinQueue(ChessPlayer player);
+        void LeaveQueue(string connectionId);
+        void SuspendGame(string contextConnectionId);
+        OnlineChessGame? GetGameByConnectionId(string connectionId);
+        public bool RemoveGame(string gameId);
     }
 }

@@ -44,8 +44,7 @@ namespace ChessWebApp.Hubs
             }
 
             PieceTeam team = color == "white" ? PieceTeam.WHITE : PieceTeam.BLACK;
-            PlayerInfo playerInfo = new PlayerInfo();
-            playerInfo.ConnectionId = Context.ConnectionId;
+            ChessPlayer playerInfo = new ChessPlayer(Context.ConnectionId);
             playerInfo.Team = team;
             if(Context.User.Identity.IsAuthenticated)
             {

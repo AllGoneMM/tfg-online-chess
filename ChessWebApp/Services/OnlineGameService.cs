@@ -6,210 +6,127 @@ using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using ChessLibrary.Engine;
 using ChessLibrary.Models.Pieces;
+using ChessWebApp.Models;
 
 namespace ChessWebApp.Services
 {
-    public class OnlineGameService : IOnlineGameService
+
+    public class OnlineGameService(ILogger<OnlineGameService> logger, IHttpContextAccessor accessor) : IOnlineGameService
     {
-        private readonly ConcurrentDictionary<string, ChessGame> _groupToGame = new ConcurrentDictionary<string, ChessGame>();
-        private readonly ConcurrentDictionary<PlayerInfo, string> _playerInfoToGroup = new ConcurrentDictionary<PlayerInfo, string>();
-        private readonly ConcurrentDictionary<string, PlayerInfo> _players = new ConcurrentDictionary<string, PlayerInfo>();
-        private readonly ConcurrentQueue<PlayerInfo> _waitingPlayers = new ConcurrentQueue<PlayerInfo>();
-        private readonly ILogger<OnlineGameService> _logger;
+        private readonly ConcurrentDictionary<string, OnlineChessGame> _gameIdToOnlineChessGames = new ConcurrentDictionary<string, OnlineChessGame>();
+        private readonly ConcurrentDictionary<string, string> _connectionIdToGameId = new ConcurrentDictionary<string, string>();
+        private readonly ConcurrentQueue<ChessPlayer> _queue = new ConcurrentQueue<ChessPlayer>();
+        private readonly ILogger<OnlineGameService> _logger = logger;
 
-        public OnlineGameService(ILogger<OnlineGameService> logger)
+        public OnlineChessGame? JoinQueue(ChessPlayer player)
         {
-            _logger = logger;
-        }
-
-        public async Task<Dictionary<string, (ChessGameResponse, ChessGameInfoResponse)>> JoinQueue(PlayerInfo playerInfo)
-        {
-            _players.AddOrUpdate(playerInfo.ConnectionId, playerInfo, (_, _) => playerInfo); _waitingPlayers.Enqueue(playerInfo);
-            return await TryStartGame();
-        }
-
-        private async Task<Dictionary<string, (ChessGameResponse, ChessGameInfoResponse)>> TryStartGame()
-        {
-            var result = new Dictionary<string, (ChessGameResponse, ChessGameInfoResponse)>();
-
-            if (_waitingPlayers.Count >= 2)
+            _queue.Enqueue(player);
+            if (_queue.Count >= 2)
             {
-                if (_waitingPlayers.TryDequeue(out var player1Info) && _waitingPlayers.TryDequeue(out var player2Info))
+                if (_queue.TryDequeue(out var player1) && _queue.TryDequeue(out var player2))
                 {
-                    var group = Guid.NewGuid().ToString();
 
-                    _playerInfoToGroup.AddOrUpdate(player1Info, group, (_, _) => group);
-                    _playerInfoToGroup.AddOrUpdate(player2Info, group, (_, _) => group);
-
-                    _groupToGame.TryRemove(group, out _);
-                    var game = _groupToGame.GetOrAdd(group, _ => new ChessGame());
-
-                    player1Info.Team = PieceTeam.WHITE;
-                    player2Info.Team = PieceTeam.BLACK;
-
-                    var player1GameInfo = new ChessGameInfoResponse
+                    Random random = new Random();
+                    if (random.Next(0, 2) == 0)
                     {
-                        PlayerInformation = new PlayerInfo() { Team = PieceTeam.WHITE, Username = player1Info.Username },
-                        OpponentInformation = new PlayerInfo() { Team = PieceTeam.BLACK, Username = player2Info.Username }
-                    };
-
-                    var player2GameInfo = new ChessGameInfoResponse
-                    {
-                        PlayerInformation = new PlayerInfo() { Team = PieceTeam.BLACK, Username = player2Info.Username },
-                        OpponentInformation = new PlayerInfo() { Team = PieceTeam.WHITE, Username = player1Info.Username }
-                    };
-
-                    ChessGameResponse player1GameResponse;
-                    ChessGameResponse player2GameResponse;
-
-                    player1GameResponse = new ChessGameResponse()
-                    {
-                        Fen = game.ToString(),
-                        State = game.State,
-                        Turn = game.Turn,
-                        LegalMoves = game.GetAllLegalMoves(player1Info.Team),
-                        Promotion = game.Promotion,
-                    };
-                    player2GameResponse = new ChessGameResponse()
-                    {
-                        Fen = game.ToString(),
-                        State = game.State,
-                        Turn = game.Turn,
-                        LegalMoves = game.GetAllLegalMoves(player2Info.Team),
-                        Promotion = game.Promotion,
-                    };
-
-                    result.Add(player1Info.ConnectionId, (player1GameResponse, player1GameInfo));
-                    result.Add(player2Info.ConnectionId, (player2GameResponse, player2GameInfo));
-                }
-            }
-
-            return result;
-        }
-
-        public async Task LeaveQueue(string connectionId)
-        {
-            if (_players.TryGetValue(connectionId, out var playerInfo))
-            {
-                var newQueue = new ConcurrentQueue<PlayerInfo>();
-                while (_waitingPlayers.TryDequeue(out var player))
-                {
-                    if (playerInfo != player)
-                    {
-                        newQueue.Enqueue(playerInfo);
+                        player1.Team = PieceTeam.WHITE;
+                        player2.Team = PieceTeam.BLACK;
                     }
-                }
-                while (newQueue.TryDequeue(out var player))
-                {
-                    _waitingPlayers.Enqueue(player);
-                }
-            }
-        }
-
-        public void TryRemoveGame(PlayerInfo playerInfo)
-        {
-            if (_playerInfoToGroup.TryGetValue(playerInfo, out var group))
-            {
-                _groupToGame.TryRemove(group, out _);
-                _playerInfoToGroup.TryRemove(playerInfo, out _);
-                _players.TryRemove(playerInfo.ConnectionId, out _);
-            }
-        }
-
-        public void TryRemovePlayer(PlayerInfo playerInfo)
-        {
-            _playerInfoToGroup.TryRemove(playerInfo, out _);
-            _players.TryRemove(playerInfo.ConnectionId, out _);
-        }
-
-        public (ChessGameResponse, ChessGameResponse) ProcessMove(string connectionId, string move)
-        {
-            var response = new ChessGameResponse();
-            var opponentResponse = new ChessGameResponse();
-            if (_players.TryGetValue(connectionId, out var playerInfo))
-            {
-                if (_playerInfoToGroup.TryGetValue(playerInfo, out var group) &&
-                    _groupToGame.TryGetValue(group, out var game))
-                {
-                    MoveResult moveResult = game.Move(move);
-                    response.MoveResult = moveResult;
-                    response.Fen = game.ToString();
-                    response.State = game.State;
-                    response.Turn = game.Turn;
-                    response.Promotion = game.Promotion;
-                    response.LegalMoves = game.GetAllLegalMoves(playerInfo.Team);
-
-                    if (moveResult.IsSuccessful())
+                    else
                     {
-                        opponentResponse.Fen = game.ToString();
-                        opponentResponse.State = game.State;
-                        opponentResponse.Turn = game.Turn;
-                        opponentResponse.Promotion = game.Promotion;
-                        opponentResponse.LegalMoves = game.GetAllLegalMoves();
+                        player1.Team = PieceTeam.BLACK;
+                        player2.Team = PieceTeam.WHITE;
                     }
+
+                    var game = new OnlineChessGame(player1, player2);
+                    AddGame(game);
+                    return game;
                 }
             }
-            return (response, opponentResponse);
+
+            return null;
         }
 
-        public async Task LeaveGame(string connectionId)
+        public void LeaveQueue(string connectionId)
         {
-            if (_players.TryGetValue(connectionId, out var playerInfo))
+            var newQueue = new ConcurrentQueue<ChessPlayer>(_queue.Where(player => player.ConnectionId != connectionId));
+
+            // Reemplazar la cola original con la nueva cola
+            while (_queue.TryDequeue(out _)) { }
+            foreach (var player in newQueue)
             {
-                if (_playerInfoToGroup.TryGetValue(playerInfo, out var group))
-                {
-                    _groupToGame.TryRemove(group, out _);
-                    _playerInfoToGroup.TryRemove(playerInfo, out _);
-                    _players.TryRemove(connectionId, out _);
-                }
+                _queue.Enqueue(player);
             }
         }
 
-        public string GetGroup(string connectionId)
+        public OnlineChessGame? GetGameByConnectionId(string connectionId)
         {
-            _players.TryGetValue(connectionId, out var playerInfo);
-            _playerInfoToGroup.TryGetValue(playerInfo, out var group);
-            return group;
-        }
-        public List<string> GetPlayersInGroup(string group)
-        {
-            var players = new List<string>();
-
-            foreach (var kvp in _playerInfoToGroup)
+            if (_connectionIdToGameId.TryGetValue(connectionId, out var gameId))
             {
-                if (kvp.Value == group)
+                if (_gameIdToOnlineChessGames.TryGetValue(gameId, out var game))
                 {
-                    players.Add(kvp.Key.ConnectionId);
+                    return game;
                 }
             }
-
-            return players;
+            return null;
         }
 
-        public (ChessGameResponse, ChessGameResponse) Promote(string connectionId, string pieceChar)
+        private bool AddGame(OnlineChessGame game)
         {
-            var response = new ChessGameResponse();
-            var opponentResponse = new ChessGameResponse();
-            if (_players.TryGetValue(connectionId, out var playerInfo))
-            {
-                if (_playerInfoToGroup.TryGetValue(playerInfo, out var group) &&
-                    _groupToGame.TryGetValue(group, out var game))
-                {
-                    game.Promote(pieceChar);
-                    response.Fen = game.ToString();
-                    response.State = game.State;
-                    response.Turn = game.Turn;
-                    response.Promotion = game.Promotion;
-                    response.LegalMoves = game.GetAllLegalMoves(playerInfo.Team);
+            bool addedToGameDict = _gameIdToOnlineChessGames.TryAdd(game.GameId, game);
+            bool addedPlayer1 = _connectionIdToGameId.TryAdd(game.Player1.ConnectionId, game.GameId);
+            bool addedPlayer2 = _connectionIdToGameId.TryAdd(game.Player2.ConnectionId, game.GameId);
 
-                    opponentResponse.Fen = game.ToString();
-                    opponentResponse.State = game.State;
-                    opponentResponse.Turn = game.Turn;
-                    opponentResponse.Promotion = game.Promotion;
-                    opponentResponse.LegalMoves = game.GetAllLegalMoves();
+            // Si cualquiera de las adiciones falla, se revierte todo
+            if (!addedToGameDict || !addedPlayer1 || !addedPlayer2)
+            {
+                // Revertir cualquier operación exitosa
+                if (addedToGameDict)
+                {
+                    _gameIdToOnlineChessGames.TryRemove(game.GameId, out _);
+                }
+                if (addedPlayer1)
+                {
+                    _connectionIdToGameId.TryRemove(game.Player1.ConnectionId, out _);
+                }
+                if (addedPlayer2)
+                {
+                    _connectionIdToGameId.TryRemove(game.Player2.ConnectionId, out _);
+                }
+                return false;
+            }
+
+            return true;
+        }
+
+        public bool RemoveGame(string gameId)
+        {
+            if (_gameIdToOnlineChessGames.TryRemove(gameId, out var game))
+            {
+                _connectionIdToGameId.TryRemove(game.Player1.ConnectionId, out _);
+                _connectionIdToGameId.TryRemove(game.Player2.ConnectionId, out _);
+                return true;
+            }
+
+            return false;
+        }
+
+        public void SuspendGame(string connectionId)
+        {
+            var game = GetGameByConnectionId(connectionId);
+            if (game != null)
+            {
+                if(game.Player1.ConnectionId == connectionId)
+                {
+                    game.Game.AbortGame((PieceTeam)game.Player1.Team);
+                }
+                else if(game.Player2.ConnectionId == connectionId)
+                {
+                    game.Game.AbortGame((PieceTeam)game.Player2.Team);
+
                 }
             }
-            return (response, opponentResponse);
         }
+
     }
 }
