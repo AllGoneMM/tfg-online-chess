@@ -9,7 +9,7 @@
     @await RenderSectionAsync("Stylesheets", required: false)
     <script src="https://kit.fontawesome.com/0f96db56df.js" crossorigin="anonymous"></script>
 </head>
-<body asp-active-controller-action="Account:LogIn SignUp" asp-active-class-add="login-background">
+<body asp-active-controller-action="Account:LogIn SignUp" asp-active-class-add="login-background container" asp-active-class-remove="container-fluid">
     <header>
         <partial name="Navbar/_Navbar" />
     </header>
