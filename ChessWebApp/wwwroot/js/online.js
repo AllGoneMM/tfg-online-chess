@@ -131,7 +131,9 @@ async function handleGameStart() {
 async function initializeSignalRConnection() {
     if (!signalRConnection) {
         signalRConnection = new signalR.HubConnectionBuilder()
-            .withUrl("/hubs/onlinegame", signalR.HttpTransportType.WebSockets)
+            .withUrl("/hubs/onlinegame", {
+                transport: signalR.HttpTransportType.WebSockets | signalR.HttpTransportType.ServerSentEvents | signalR.HttpTransportType.LongPolling
+            })
             .withAutomaticReconnect()
             .build();
 

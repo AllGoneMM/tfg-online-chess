@@ -13,17 +13,17 @@
 <div class="row justify-content-center" style="background-color:#302e2b">
     <div id="colBoardContainer" class="col-auto ps-4 pe-4 pe-lg-0 align-items-center d-flex">
         <div id="boardContainer" class="mx-auto w-100">
+            <div id="auxDiv"></div>
             <!--OPPONENT CONTAINER-->
             <div id="opponentInfo" class="pt-1 pb-1">
                 <div class="p-1 fw-semibold d-flex gap-2 align-items-center rounded" style="background-color:#525c66">
                     <div class="rounded rounded bg-danger border border-white border-2" style="width:30px; height:30px;">
-                        <img src="~/assets/img/user.png" class="img-fluid" />
+                        <img src="~/assets/img/user.png" class="img-fluid"/>
                     </div>
                     <span id="opponentUsername" class="text-white">OPPONENT</span>
                 </div>
 
             </div>
-            <div id="auxDiv"></div>
             <!--BOARD CONTAINER-->
             <div id="board" class="shadow-lg"></div>
 
@@ -31,7 +31,7 @@
             <div id="userInfo" class="pt-1 pb-1">
                 <div class="p-1 fw-semibold d-flex gap-2 align-items-center rounded" style="background-color:#525c66">
                     <div class="rounded rounded bg-info border border-white border-2" style="width:30px; height:30px;">
-                        <img src="~/assets/img/user.png" class="img-fluid" />
+                        <img src="~/assets/img/user.png" class="img-fluid"/>
                     </div>
                     <span id="userUsername" asp-authenticated="false" class="text-white">GUEST</span>
                     <span asp-authenticated="true" class="text-white">@Context.User?.Identity?.Name</span>

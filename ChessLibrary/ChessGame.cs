@@ -230,7 +230,11 @@ namespace ChessLibrary
 
         public void AbortGame(PieceTeam team)
         {
-            State = team == PieceTeam.WHITE ? State.WIN_BLACK_WHITE_ABORT : State.WIN_WHITE_BLACK_ABORT;
+            if (State == State.IN_PROGRESS)
+            {
+                State = team == PieceTeam.WHITE ? State.WIN_BLACK_WHITE_ABORT : State.WIN_WHITE_BLACK_ABORT;
+
+            }
         }
 
         public void Surrender(PieceTeam team)
