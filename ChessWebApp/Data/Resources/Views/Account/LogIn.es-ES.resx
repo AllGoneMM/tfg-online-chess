@@ -120,4 +120,10 @@
   <data name="Log In" xml:space="preserve">
     <value>Iniciar sesión</value>
   </data>
+  <data name="Password" xml:space="preserve">
+    <value>Contraseña</value>
+  </data>
+  <data name="Username" xml:space="preserve">
+    <value>Nombre de usuario</value>
+  </data>
 </root>

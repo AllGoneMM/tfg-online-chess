@@ -2,7 +2,7 @@
 
 namespace ChessWebApp.Models.ViewModels
 {
-    public class SignUpVM
+    public class SignUpVm
     {
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Please enter a valid email")]

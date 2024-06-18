@@ -1,14 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations;
+
 using Microsoft.Extensions.Localization;
 
 namespace ChessWebApp.Models.ViewModels
 {
-    public class LogInVM
+    public class LogInVm
     {
+        
         [Required(ErrorMessage = "Username is required")]
         [Display(Prompt = "Username")]
         public string? Username { get; set; }
-
+        
         [Required(ErrorMessage = "Password is required")]
         [Display(Prompt = "Password")]
         [DataType(DataType.Password)]

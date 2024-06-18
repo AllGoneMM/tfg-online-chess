@@ -38,7 +38,7 @@ namespace ChessWebApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> LogIn(LogInVM logInVm)
+        public async Task<IActionResult> LogIn(LogInVm logInVm)
         {
             if (ModelState.IsValid)
             {
@@ -56,7 +56,7 @@ namespace ChessWebApp.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SignUp(SignUpVM signUpVM)
+        public async Task<IActionResult> SignUp(SignUpVm signUpVM)
         {
             if (ModelState.IsValid)
             {

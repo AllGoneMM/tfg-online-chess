@@ -17,3 +17,15 @@ $(document).ready(function () {
         }
     });
 });
+
+function togglePasswordVisibility() {
+    var passwordField = document.getElementById("password");
+    var toggleButton = document.getElementById("togglePassword");
+    if (passwordField.type === "password") {
+        passwordField.type = "text";
+        toggleButton.innerHTML = '<i class="fa-solid fa-eye-slash"></i>';
+    } else {
+        passwordField.type = "password";
+        toggleButton.innerHTML = '<i class="fa-solid fa-eye"></i>';
+    }
+}

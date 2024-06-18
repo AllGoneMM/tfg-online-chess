@@ -9,7 +9,7 @@ namespace ChessWebApp.Models.DTOs
     {
         public string? Fen { get; set; }
         public MoveResult? MoveResult { get; set; }
-        
+        public List<string>? MoveHistory { get; set; }
         public PieceTeam? Turn { get; set; }
         public State? State { get; set; }
         public Square? Promotion { get; set; }

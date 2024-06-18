@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 
 namespace ChessWebApp
 {
@@ -21,8 +22,14 @@ namespace ChessWebApp
             var connectionString = builder.Configuration.GetConnectionString("ChessIdentity") ?? throw new InvalidOperationException("Connection string 'ChessIdentity' not found.");
             builder.Services.AddControllersWithViews()
                 .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
-                .AddDataAnnotationsLocalization();
-                
+                .AddDataAnnotationsLocalization(options =>
+                {
+                    var type = typeof(LogInVm);
+                    var factory = builder.Services.BuildServiceProvider().GetService<IStringLocalizerFactory>();
+                    var localizer = factory.Create(type);
+                    options.DataAnnotationLocalizerProvider = (t, f) => localizer;
+                });
+
             builder.Services.AddLocalization(options => options.ResourcesPath = "Data/Resources");
             builder.Services.Configure<RequestLocalizationOptions>(options =>
             {

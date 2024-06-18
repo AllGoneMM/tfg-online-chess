@@ -57,7 +57,8 @@ namespace ChessWebApp.Services
             {
                 Fen = game.ToString(),
                 State = game.State,
-                Turn = game.Turn
+                Turn = game.Turn,
+                MoveHistory = game.MoveHistory
             };
             if(game.Turn == playerInfo.Team)
             {
@@ -113,6 +114,7 @@ namespace ChessWebApp.Services
                 response.State = game.State;
                 response.Promotion = game.Promotion;
                 response.Turn = game.Turn;
+                response.MoveHistory = game.MoveHistory;
 
                 return response;
             }
@@ -181,6 +183,7 @@ namespace ChessWebApp.Services
                 response.Fen = game.ToString();
                 response.State = game.State;
                 response.Turn = game.Turn;
+                response.MoveHistory = game.MoveHistory;
 
                 if (game.State == State.IN_PROGRESS)
                 {

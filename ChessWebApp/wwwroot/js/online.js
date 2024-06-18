@@ -382,6 +382,7 @@ function transformLegalMovesToDictionary(legalMoves) {
     return result;
 }
 function openModal() {
+    signalRConnection.stop();
     let endGameTitle = "";
     let endGameBody = "";
     switch (game.State) {
@@ -419,11 +420,19 @@ function openModal() {
             break;
         default:
             break;
+
     }
     document.getElementById('endGameTitle').innerText = endGameTitle;
     document.getElementById('endGameBody').innerText = endGameBody;
     const gameInfo = new bootstrap.Modal(document.getElementById('endGameModal'));
+    const gameInfoElement = (document.getElementById('endGameModal').addEventListener('hidden.bs.modal', event => {
+        gameInfo.dispose();
+    }));
     gameInfo.show();
+    document.getElementById("queueUP").classList.remove("hidden");
+    document.getElementById("queueUP").classList.remove("queue-btn");
+    document.getElementById("cancelQueueIcon").classList.remove("cancel-queue-icon");
+    document.getElementById("spinner").classList.remove("spinner-border", "loading-spinner");
 }
 
 // ------------------------------------------------------

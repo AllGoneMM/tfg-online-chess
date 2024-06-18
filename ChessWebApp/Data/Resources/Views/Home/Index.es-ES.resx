@@ -123,6 +123,9 @@
   <data name="Play" xml:space="preserve">
     <value>Jugar</value>
   </data>
+  <data name="Play against AI" xml:space="preserve">
+    <value>Juega contra la IA</value>
+  </data>
   <data name="Play chess" xml:space="preserve">
     <value>Juega al ajedrez</value>
   </data>

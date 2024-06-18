@@ -63,6 +63,8 @@ let game;
 let signalRConnection;
 let playerTeam;
 var audio = new Audio('/assets/mp3/chess-move-sound.mp3');
+var boardStartAudio = new Audio('/assets/mp3/board-start.mp3');
+
 
 // Chessboard setup
 const board = new Chessboard(document.getElementById("board"), {
@@ -126,6 +128,8 @@ async function startSignalRConnection() {
 
 async function invokeStartGame() {
     board.setPosition(FEN.start, true);
+    boardStartAudio.play();
+
     playerTeam = document.getElementById('black').checked ? 'black' : 'white';
     if (playerTeam === 'black') {
         board.setOrientation(COLOR.black, true);
@@ -142,6 +146,7 @@ async function invokeStartGame() {
         board.setPosition(game.Fen, true);
         if (playerTeam === "black") {
             audio.play();
+
         }
 
         if (game.Turn === PieceTeamInt[playerTeam]) {
@@ -156,6 +161,7 @@ async function invokeStartGame() {
 function handleStockfishMove(response) {
     game = JSON.parse(response);
     board.setPosition(game.Fen, true);
+    drawMoveHistory(game.MoveHistory);
     audio.play();
 
     if (game.State === State.IN_PROGRESS) {
@@ -234,6 +240,7 @@ async function handleValidateMoveInput(event) {
 
         if (moveResult) {
             game = auxGame;
+            drawMoveHistory(game.MoveHistory);
         }
     }
     catch (error) {
@@ -352,3 +359,37 @@ function setDynamicHeight() {
 window.addEventListener('load', setDynamicHeight);
 window.addEventListener('resize', setDynamicHeight);
 
+
+function drawMoveHistory(moveHistory) {
+    let moveHistoryTable = document.getElementById("moveHistoryTable");
+    moveHistoryTable.innerHTML = ''; // Clear previous history
+
+    moveHistory.forEach((move, index) => {
+        let row = document.createElement('tr');
+
+        // Create the "Move #" column (th)
+        let th = document.createElement('th');
+        th.textContent = index + 1;
+        th.classList.add("transparent-background");
+        row.appendChild(th);
+
+        // Extract white and black moves from the move string
+        let whiteMove = move.substring(0, 2); // First two characters
+        let blackMove = move.substring(2, 4); // Next two characters
+
+        // Create the "White" column (td)
+        let whiteMoveCell = document.createElement('td');
+        whiteMoveCell.textContent = whiteMove;
+        whiteMoveCell.classList.add("transparent-background");
+        row.appendChild(whiteMoveCell);
+
+        // Create the "Black" column (td)
+        let blackMoveCell = document.createElement('td');
+        blackMoveCell.textContent = blackMove || ''; // Handle cases where there might not be a black move
+        blackMoveCell.classList.add("transparent-background");
+        row.appendChild(blackMoveCell);
+
+        // Append the row to the table body
+        moveHistoryTable.appendChild(row);
+    });
+}
