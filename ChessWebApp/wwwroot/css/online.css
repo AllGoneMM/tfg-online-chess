@@ -1,37 +1,45 @@
-﻿.queue-btn {
+﻿.transparent-background {
+    background-color: transparent !important;
+}
+
+.queue-btn {
     background-color: #0dcaf0 !important;
 }
+
     .queue-btn div {
         display: block !important;
     }
+
     .queue-btn:hover {
         background-color: #dc3545 !important;
     }
-    .queue-btn:hover i {
-        display:inline !important;
-    }
+
+        .queue-btn:hover i {
+            display: inline !important;
+        }
 
 .cancel-queue-icon {
     top: 30%;
     right: 20px;
 }
+
 .loading-spinner {
     top: 15%;
     left: 20px;
 }
 
-.hidden{
-        display: none !important;
-
+.hidden {
+    display: none !important;
 }
 
 #moveHistoryDiv {
-    overflow-y: auto; /* Habilita el desplazamiento vertical */
+    overflow-y: scroll; /* Habilita el desplazamiento vertical */
+    height: 300px; /* Ajusta esta altura según sea necesario */
 }
 
 .table-responsive {
     width: 100%;
-    overflow-x: auto;
+    overflow-x: scroll;
     -webkit-overflow-scrolling: touch;
 }
 
@@ -63,6 +71,6 @@
         background: #555; /* Color del thumb cuando el usuario pasa el cursor por encima */
     }
 
-.transparent-background{
+.transparent-background {
     background-color: transparent !important;
 }
